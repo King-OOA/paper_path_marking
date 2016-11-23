@@ -57,33 +57,22 @@
 %comby{(xxxxxxxxxx)}
 %end{history}
 
-Although significant efforts have been made to address this problem,
-the increasing complexity and size of biological data require more
-efficient methods applicable to an arbitrary number of strings.
-
-In Big Data era, the lengths and sizes of these sequences are growing
-explosively, leading to grand challenges for the classical NP-hard
-problem, namely search- ing for the Multiple Longest Common
-Subsequences (MLC- S ) from multiple sequences.
-
-
-
 \begin{abstract}
 
   Searching for the Multiple Longest Common Subsequences (MLCS) of
   multiple sequences is a classical NP-hard problem that is widely
-  used in many areas such as bioinformatics and biomedicine. Although
-  significant efforts have been made to address this problem, the
-  increasing amount of biological data require more efficient
-  methods. In this paper, we present a novel fast algorithm for the
-  MLCS problem, which is based on the dominant point approach and
-  employs a new technique called path marking. During the construction
-  of the dominant point graph, the path marking technique can
-  real-timely mark the longest path from the source node to the
+  used in many areas such as bioinformatics and biomedicine,
+  etc. Although significant efforts have been made to address this
+  problem, the increasing amount of biological data require more
+  efficient methods. In this paper, we present a novel fast algorithm
+  for the MLCS problem, which is based on the dominant point approach
+  and employs a new technique called path marking. During the
+  construction of the dominant point graph, the path marking technique
+  can real-timely mark the longest path from the source node to the
   current node, and once the graph has been constructed the longest
   paths corresponding to every MLCS can be found immediately. The
   experimental results demonstrate that, comparing with the ``Minima''
-  operation that is widely used in the current algorithms, the path
+  operation that is widely used in the existing algorithms, the path
   marking is much more efficient, and therefore our algorithm is
   faster than those algorithms.
 
@@ -98,81 +87,36 @@ Subsequences (MLC- S ) from multiple sequences.
 \section{Introduction}
 \label{sec:introduction}
 
-String matching (SM) has been historically one of the key areas of
-computer science. According to the number of strings to be matched
-simultaneously, string matching technologies can be classified into
-single string matching (SSM) and multi-string matching (MSM), and this
-paper mainly focuses on the latter.
 
-The MSM is a primitive but critical operation used in many
-applications such as pattern recognition, ontology alignments
-\cite{Xue2015} \cite{Xue2016}, information retrieval, intrusion
-detection system \cite{Kim2015}, etc. In general, it seeks all
-positions in a text string that match any of the string patterns in a
-given pattern set. An efficient algorithm for MSM only needs to scan
-the text once and finds all patterns concurrently. Traditionally, the
-existing algorithms include two major phases, i.e. the
-\textsf{preprocessing phase} and the \textsf{matching phase}. In the
-\textsf{preprocessing phase}, a suitable data structure is constructed
-to store all the string patterns, and then the \textsf{matching phase}
-scans and compares the given text with the data structure to find all
-occurrences of every pattern in the text. It is obvious that the time
-and space efficiency of the data structure built in the preprocessing
-phase can have a significant impact on the performance of the
-algorithm in the matching phase.
+Many kinds of biological data can be represented as a sequence of
+symbols. For instance, proteins [2] are sequences of 20 different
+symbols (amino acids), and DNA (genes) can be represented as sequences
+of four symbols A, C, G and T corresponding to the four bases.
+Measuring the similarity between biological sequences is a critical
+problem in bioinformatics, which can be used in many applications such
+as cancer diagnoses, detection of the species’ common origin [2],
+etc. One of the most important ways to measure the similarity of
+biological sequences is to find their Multiple Longest Common
+Subsequences (MLCS), which has been proved to be an NP-hard problem []
+. Traditionally, the works are focusing on either the simplest case of
+MLCS of two sequences, also known as the Longest Common Subsequences
+(LCS) problem [24], [36], [39], [45], or the problem’s special case
+of three sequences [21], [22].  With the successful implementation of
+the Human Genome Project and the advent of the era of big data, the
+amount of biological sequences and other types of sequences from
+various fields are growing explosively [3]. However, although many
+algorithms have been proposed for finding the MLCS of many sequences,
+they are not very efficient in practice for large-size problems with
+many sequences due to high time and space complexity. Therefore,
+designing more efficient MLCS algorithm for many sequences is becoming
+a more and more important research topic and facing severe challenges.
 
-Nowadays, the number of patterns to be matched becomes huge in some
-applications, for instance, the database of a modern
-anti-virus/intrusion-detection system can easily contain millions
-number of virus signatures/rules. However, the existing algorithms are
-not suitable for such applications with very large pattern sets due to
-two main reasons: 1) The poor scalability of the data structures used;
-2) The space inefficiency of the data structure used, which means
-these algorithms can not process large pattern sets with limited
-memory. Moreover, the existing algorithms are sensitive to the length
-of the patterns, particularly the length of the shortest pattern. Many
-algorithms can not efficiently deal with pattern set containing very
-short pattern due to the poor robustness of their data
-structures. Therefore, it is very valuable to design space-efficient
-data structures with good scalability and robustness to support
-applications requiring large-scale string matching.
 
-In this paper, we propose a multi-string matching engine with good
-robustness for large string pattern sets. Similarly to the existing
-efficient approaches, our approach consists of the preprocessing phase
-and the matching phase. In the preprocessing phase, the matching
-engine is constructed based on the pattern set. Then in the matching
-phase, the engine takes the text string as input, and searches the
-occurrences of each pattern in the text.
+In this paper, we propose .
 
-The proposed engine consists of a filter module and a verification
-module. The function of the filter module is to find the potential
-matched positions in the text. Once such a position is found, the
-verification module confirms whether there are patterns starting at
-that position. The filter adopted is proposed in \cite{Lee2013}, which
-is based on several bitmaps and a group of simple bit-wised
-"\emph{and}" and "\emph{shift}" operations. In the matching phase, the
-engine queries the bitmaps to check the validity of the current
-position: if the current position is a potential matched position, the
-verification module is invoked; otherwise, the engine skips over this
-position as well as the next few positions as many as possible. In
-fact, the filter is proved to be optimal in the sense that it is able
-to utilizing all previous query results, and thus can skip as many
-invalid positions as possible. For the verification module, we design
-a compact tree-like data structure called Adaptive Matching Tree
-(\textsf{AMT}) based on the pattern set. Specifically, the whole
-pattern set is gradually partitioned into several small parts first,
-and then the pattern fragments of each small part is stored in a
-separate node of the AMT for subsequent matching. The critical feature
-of AMT is that, the inner structure of each tree node is changed
-adaptively according to the features of the pattern fragments, and
-this adaptivity guarantees a high matching speed as well as a low
-memory consumption for each tree node, as a result, the whole AMT
-would be both time and space efficient for verifying in the matching
-phase.
 
-The rest of this paper is organized as follows: Section
-\ref{sec:related works} reviews some related works in MSM. Section
+The this paper is organized as follows: Section \ref{sec:related
+  works} reviews some related works in MSM. Section
 \ref{sec:notations} lists the notations and terminology used in this
 paper. Section \ref{sec:filter} describes the filter module. Section
 \ref{sec:verification} presents the verification module. Section
