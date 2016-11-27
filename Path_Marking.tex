@@ -89,40 +89,54 @@
 
 
 Many kinds of biological data can be represented as a sequence of
-symbols. For instance, proteins [2] are sequences of 20 different
+symbols. For instance, proteins [2] are sequences over 20 different
 symbols (amino acids), and DNA (genes) can be represented as sequences
-of four symbols A, C, G and T corresponding to the four bases.
-Measuring the similarity between biological sequences is a critical
+over four symbols A, C, G and T corresponding to the four bases.
+Measuring the similarity of biological sequences is a fundamental
 problem in bioinformatics, which can be used in many applications such
 as cancer diagnoses, detection of the species’ common origin [2],
 etc. One of the most important ways to measure the similarity of
 biological sequences is to find their Multiple Longest Common
 Subsequences (MLCS), which has been proved to be an NP-hard problem []
 . Traditionally, the works are focusing on either the simplest case of
-MLCS of two sequences, also known as the Longest Common Subsequences
-(LCS) problem [24], [36], [39], [45], or the problem’s special case
-of three sequences [21], [22].  With the successful implementation of
-the Human Genome Project and the advent of the era of big data, the
-amount of biological sequences and other types of sequences from
-various fields are growing explosively [3]. However, although many
-algorithms have been proposed for finding the MLCS of many sequences,
-they are not very efficient in practice for large-size problems with
-many sequences due to high time and space complexity. Therefore,
-designing more efficient MLCS algorithm for many sequences is becoming
-a more and more important research topic and facing severe challenges.
+two sequences, also known as the Longest Common Subsequences (LCS)
+problem [24], [36], [39], [45], or the problem’s special case of
+three sequences [21], [22]. Although many algorithms have been
+proposed for the general case of the problem, they are not very
+efficient in practice for large-size problems with many sequences due
+to high time and space complexity. Particularly, with the successful
+implementation of the human genome project and the development of the
+next-generation sequencing techniques, the amount of biological
+sequences (as well as other types of sequences from various fields)
+are growing explosively [3]. Therefore, it is very important and
+valuable to design more efficient MLCS algorithm to process large
+amount of biological (and other types) sequences.
 
-
-In this paper, we propose .
-
+In this paper, we proposed a fast algorithm for finding MLCS of many
+sequences. Our algorithm is based on the dominant point model, in
+which the dominant points produced during processing are organized to
+form a Directed Acyclic Graph (DAG), and each of the longest paths
+from the source node to the end node corresponds to a MLCS. Different
+from the other dominant point based algorithms that using a
+time-consuming \emph{Minima} operation to delete the redundant nodes,
+and then search for the longest path from the source node to the end
+node to find the MLCS, our method employs a technical called
+\emph{path marking}, whenever a node is generated, the longest path
+from the source node to the new node is updated immediately, and once
+the DAG is constructed, all the MLCS can be found directly from the
+end node back to the source node by the marked path. The experiments
+shows that the \emph{path marking} technique is much efficient than
+the \emph{Minima} operation, so that our algorithm is much faster than
+the compared algorithms.
 
 The this paper is organized as follows: Section \ref{sec:related
-  works} reviews some related works in MSM. Section
+  works} reviews some related works in the MLCS problem. Section
 \ref{sec:notations} lists the notations and terminology used in this
-paper. Section \ref{sec:filter} describes the filter module. Section
-\ref{sec:verification} presents the verification module. Section
-\ref{sec:experiments} presents the performance evaluations. Section
-\ref{sec:conclusion} concludes the paper and proposes some open
-problems.
+paper. In section \ref{sec:algorithm}, the our new algorithm is
+presented in details. In section \ref{sec:experiments}, experimental
+results comparing the performances of the new algorithms with existing
+ones are presented. In Section \ref{sec:conclusion} we summarize the
+paper.
 
 \section{Related Works}
 \label{sec:related works}
