@@ -1,14 +1,5 @@
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% Trim Size: 9.75in x 6.5in
-%% Text Area: 8in (include Runningheads) x 5in
-%% ws-ijprai.cls   :   8-8-2014
-%% Class file to use with ws-ijprai.tex written in Latex2E.
-%% The content, structure, format and layout of this style file is the
-%% property of World Scientific Publishing Co. Pte. Ltd.
-%% Copyright 2014 by World Scientific Publishing Co.
-%% All rights are reserved.
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%
+\documentclass{article}
+
 
 \usepackage{enumerate}
 
@@ -36,17 +27,11 @@
 \begin{document}
 
 
-\title{A Efficient Multiple Longest Common Subsequences (MLCS)
-  Algorithm Based on Path Marking}
-
+\title{A Efficient Exact Algorithm for Multiple Longest Common
+  Subsequences (MLCS) Problem Based on Path Marking}
 
 \author{Zhan Peng, Yuping Wang\footnote{Corresponding author}~,}
 
-\address{$^1$School of Computer Science and Technology\\
-  Xidian University\\
-  Xi'an, Shaanxi, 710071, China\\
-   $^*$ywang@xidian.edu.cn
-}
 
 \maketitle
 
@@ -78,7 +63,7 @@
 
 \end{abstract}
 
-\keywords{multiple longest common subsequences (MLCS); Longest common
+\textbf{multiple longest common subsequences (MLCS); Longest common
   subsequence (LCS); dominant point method}
 
 % due to the effectiveness of the filter and the compactness of the AMT
@@ -119,7 +104,7 @@ form a Directed Acyclic Graph (DAG), and each of the longest paths
 from the source node to the end node corresponds to a MLCS. Different
 from the other dominant point based algorithms that using a
 time-consuming \emph{Minima} operation to delete the redundant nodes,
-and then search for the longest path from the source node to the end
+and then search for the longest paths from the source node to the end
 node to find the MLCS, our method employs a technical called
 \emph{path marking}, whenever a node is generated, the longest path
 from the source node to the new node is updated immediately, and once
@@ -130,152 +115,69 @@ the \emph{Minima} operation, so that our algorithm is much faster than
 the compared algorithms.
 
 The this paper is organized as follows: Section \ref{sec:related
-  works} reviews some related works in the MLCS problem. Section
-\ref{sec:notations} lists the notations and terminology used in this
-paper. In section \ref{sec:algorithm}, the our new algorithm is
-presented in details. In section \ref{sec:experiments}, experimental
-results comparing the performances of the new algorithms with existing
-ones are presented. In Section \ref{sec:conclusion} we summarize the
-paper.
+  works} introduces some preliminaries and reviews the related works
+in the MLCS problem. Section \ref{sec:notations} lists the notations
+and terminology used in this paper. In section \ref{sec:algorithm},
+the our new algorithm is presented in details. In section
+\ref{sec:experiments}, experimental results comparing the performances
+of the new algorithms with existing ones are presented. In Section
+\ref{sec:conclusion} we summarize the paper.
 
-\section{Related Works}
+\section{Preliminaries and Related Works}
 \label{sec:related works}
 
+In this section, we define some notations and terminology used in this
+paper and reviews some related works in the MLCS problem.
+
+\subsection{Definitions}
+\label{sec:definitions}
+
+Let $\Sigma$ represents a finite alphabet for the sequences, such as
+$\Sigma={A, C, T, G}$ for the DNA sequences.
+
+\textbf{Definition 1.} Let $s=c_1c_2...c_n$ be a sequence with length
+$n$ over $\Sigma$. A subsequence of $s$ is the one that can be
+obtained by deleting zero or more (not necessarily consecutive)
+characters from $s$. Formally, $s'=c_{i_1}c_{i_2}...c_{i_k}$ is called
+a subsequence of $s$, if $\forall j, 1< \leq j \leq k$:
+$1 \leq i_j \leq n$, and for all $r$ and $t$, $1 \leq r < t \leq k$:
+$i_r < i_t$.
+
+\textbf{Definition 2.} Let $S={s_1, s_2, ..., s_d}$ be a set of
+sequences over $\Sigma$. A Longest Common Subsequence (\emph{LCS}) of
+$S$ is a sequence $a$ such that: 1. $a$ is a subsequence of all $s_i$
+, $1 \leq i \leq d$; 2. there is no sequence satisfying 1 and longer
+than $a$.
+
+In general, given $d$ sequences over a finite alphabet $\Sigma$, there
+usually exists more than one LCS. For example, given three sequences
+$s_1 = ACTAGTGC$, $s_2 = TGCTAGCA$ and $s_3 = CATGCGAT$ over
+$\Sigma = {A, C, G, T}$, there are two LCS with length 4, which are
+$LCS_1 = CAGC$, $LCS_2 = CTGC$, respectively. The MLCS problem is to
+find all LCSs of three or more sequences. For two sequences, the
+problem is commonly called the LCS problem. Specific algorithms
+developed for LCS are generally inefficient for MLCS. Obviously, the
+LCS is a special case of the MLCS.
+
+\textbf{Definition 3.} Let $S = {s_1, s_2, ..., s_d}$ be a set of
+sequences over $\Sigma$, and $s_i[j]$ be the $j-th$ character of
+$s_i$. A point $p = (p_1, p_2, ..., p_d)$ is called a \emph{match
+point} of $S$ if $s_1[p_1] = s_2[p_2] = ... = s_d[p_d] = \delta$,
+where $\delta$ is the character corresponding to the matched point
+$p$.
+
+
+\textbf{Definition 4.} Given two match points $p = {p_1, p_2, ...,
+p_d}$ and $q = {q_1, q_2, ..., q_d}$ of $S$, we say that $p = q$, if
+and only if $p_i = q_i$, for $1 \leq i \leq d$.  If for $1 \leq i \leq
+d$, there is $p_i \leq q_i$, we say $p$ dominates $q$, denoted as $p
+\preceq q$. Further, if for $1 \leq i \leq d$, there is $p_i < q_i$,
+we say $p$ strongly dominates $q$, denoted as $p \prec q$.
+
+
+
 Because of the importance of PM, several efficient algorithms have
-been proposed in the past decades. Well-known algorithms for PM
-include Knuth-Morris-Pratt (\textsf{KMP}) \cite{Knuth1977},
-Boyer-Moore (\textsf{BM}) \cite{Boyer1977}, Wu-Manber (\textsf{WM})
-\cite{Wu1994}, and Aho-Corasick (\textsf{AC}) \cite{Aho1975}. The
-\textsf{KMP} and \textsf{BM} algorithms are appropriate for SPM, but
-not suitable for MPM. The \textsf{AC} algorithm is a generalization of
-the \textsf{KMP} algorithm by preprocessing the patterns and building
-a deterministic finite automaton (DFA) that can match multiple
-patterns simultaneously. It is the first algorithm for MPM that has a
-linear time complexity. However, the \textsf{AC} algorithm is
-alphabet-sensitive and requires a huge amount of memory to build the
-DFA, which limits its application in large-scale pattern matching.
-
-To reduce the memory requirement of \textsf{AC}, Tuck \cite{Tuck2004}
-proposed an algorithm called \textsf{Bitmapped AC}. This algorithm
-uses the bitmap data structure to replace the conventional child
-pointers in each state. In addition, it uses a path compression
-technique which can merge successive single-child states into one
-state. It is reported that, the compression optimization of
-\textsf{Bitmapped AC} results in a 50 times reduction in memory
-consumption over the default \textsf{AC} algorithm. However, since
-traversal from node to node requires checking a bit in a bitmap and
-then performing a sum up to 256 prior bits in the bitmap, the average
-performance of this algorithm is not high.  Another algorithm to
-reduce the space requirement is the \textsf{Compressed AC} algorithm
-proposed by \cite{Bremeler2011}. In addition to use a similar path
-compression method, this algorithm also develops a technique that can
-eliminate the leaf states. The experiment shows that
-\textsf{Compressed AC} can reduce at most $60\%$ memory requirement
-compared with the traditionally \textsf{AC} algorithm. But it only
-works well for problems with a few pattern sets. Lee \cite{Lee2013}
-proposed an algorithm called \textsf{Pre-filter+AC}. As the name
-shows, this algorithm consists of a pre-filter and a verification
-engine. The function of the pre-filter is to query data structures
-built from patterns to find the starting positions of potential
-pattern occurrences. Once a suspicious starting position is found, the
-verification engine confirms true pattern occurrence. The pre-filter
-uses a bit vector, called master bitmap, with simple bitwise-AND and
-shift operations to accumulate query results. While the verification
-engine, which is a modification of the AC automaton, checks all
-candidate patterns simultaneously rather than sequentially. However,
-as the author mentioned, the pre-filter is suitable for patterns of
-moderate or large lengths. For short patterns, its throughput
-degrades.
-
-The \textsf{WM} algorithm is another efficient algorithm for MPM which
-is known to be faster than \textsf{AC} in a typical matching. The
-\textsf{WM} algorithm is an adaptation of the \textsf{BM} algorithm to
-multiple patterns. It uses a similar ``shift idea'' of the \textsf{BM}
-algorithm, but the shift of \textsf{WM} is not based on a single
-character as the \textsf{BM} does, instead, it is based on a
-$B$-$gram$ that is a character block consists of $B$ characters ($B$
-is usually set to 2 or 3 in practice). In a typical search, its time
-complexity is $O(B \cdot n/lsp)$, where $lsp$ is the length of the
-shortest pattern in the pattern set. Therefore, the performance of WM
-is seriously affected by $lsp$.
-
-To improve the \textsf{WM} algorithm, Zhou \cite{Zhou2007} proposed an
-algorithm called \textsf{MDH}. Instead of using the first $m$
-characters as the signature of each pattern, \textsf{MDH} adopts a
-heuristic strategy to select the optimum $m$ consecutive characters as
-the signature of each pattern. Similarly, Zhan \cite{Zhan2014}
-proposed a different way to search for the optimal signatures of the
-patterns, additionally, this algorithm designs an index structure to
-reduce the time for searching the candidate patterns in the Hash
-Table. These algorithms can improve the performance of \textsf{WM} for
-common patterns but they do not solve the inefficiency caused by short
-patterns. To address this problem, Zhang \cite{Zhang2009} proposed the
-High Concurrence WM algorithm (\textsf{HCWM}), which separates the
-patterns whose length is less than 4 from the pattern set. For these
-short patterns, the algorithm establishes independent data structures
-and uses different matching routines. This method can reduce the
-effect of short patterns, since short patterns are matched
-independently and concurrently. Another algorithm for this problem is
-the \textsf{$L^{+1}$-MWM} proposed by Choi \cite{Choi2011}, which
-minimizes the performance degradation caused by the short patterns by
-appending characters to these patterns. It is reported that, the
-\textsf{$L^{+1}$-MWM} improves the performance of WM by as mush as
-$20\%$ in average, moreover, when $lsp < 5$ the \textsf{$L^{+1}$-MWM}
-gains a $38.87\%$ enhancement.
-
-For large scale pattern matching, which becomes more and more
-important in big data context, Le \cite{Le2013} presented a
-Memory-efficient Architecture for large-scale String Matching
-(\textsf{MASM}) based on a pipelined binary search tree. It uses a
-technique called ``leaf-attaching'' to compress the given pattern
-set. The compressed pattern set are then transformed to a pipelined
-binary tree which will be used in the matching phase.  It is reported
-that, the \textsf{MASM} achieves a memory efficiency (defined as the
-ratio of the amount of the required storage in bytes and the size of
-the pattern set in number of characters) of 0.56 for the Rogets
-dictionary and 1.32 for the Snort rule set. Moraru \cite{Moraru2012}
-also presented a memory-efficient and cache-optimized algorithm for
-large pattern sets. This algorithm builds upon the Rabin-Karp
-\cite{Karp1987} SPM algorithm and incorporates a new
-\textsf{feed-forward} bloom filter which takes into account the memory
-hierarchy of modern computers. This algorithm is also well suited for
-implementation on GPUs which enables the matching to be done in
-parallel.
-
-There are also studies that exploited the capacity of hardware to
-accelerate the proposed MPM engines. Agarwal \cite{Agarwal2013}
-proposed a hardware architecture which enables high throughout for
-Information Extraction applications. Instead of using the common DFA
-based approach, this architecture employs a novel hashing based
-scheme. The DFA based approaches (such as \textsf{AC}) typically
-process one character every cycle, while the proposed hash based
-scheme can process a string token of several characters every cycle,
-thus achieves higher throughout than the DFA based approaches. Zhang
-\cite{Zhang2015} proposed an GPU-based parallel algorithm
-\textsf{G-PEBF} which uses the Extended Bloom Filter (EBF). It divides
-the pattern set into $N$ subsets where the lengths of the patterns in
-each subsets are the same. Then it constructs an EBF for each subset
-and uses $N$ threads to simultaneously process the subsets in parallel
-on the GPU. The performance of \textsf{G-PEFB} highly relies on the
-number of threads used during matching, and it is also not applicable
-for pattern sets containing very short patterns.
-
-Nowadays, some variants of the classical MPM problem have been
-proposed. Tomohiro \cite{I2015} introduced a variant of MPM, where the
-pattern set is given in a compressed form that can be represented by a
-straight line program (SLP). For a given SLP-compressed pattern set of
-size $n$ and height $h$, which represents $m$ patterns of total length
-$N$, they present an $O(n^2log^N)$-size variant of AC automaton that
-recognizes all occurrences of the patterns in $O(h + m)$ running time
-per character. Khancome \cite{Khancome2013} proposed an algorithm for
-the dynamic MPM problem. This algorithm uses the \textsf{inverted
-  lists} data structure to allow the pattern set to be updated
-dynamically in an optimal time. Amir \cite{Amir2015} introduced an
-algorithm for the gapped MPM problem, where each pattern in the
-pattern set is a sequence of sub-patterns separated by bounded
-sequences of do not cares. Neuburger \cite{Neuburger2012} presented
-the first efficient algorithm that operates in small space for the
-2-dimensional MPM problem.
+been proposed in the past decades.
 
 \section{Notations}
 \label{sec:notations}
@@ -341,12 +243,12 @@ $hash(p_m[j,k]) = i$ ($p_m[j,k]$ is a $k$-symbol block starting at
 position $j$ of $p_m$), where $hash$ is a hash function that maps a
 $k$-symbol block to an integer in the range of $[0, N-1]$.
 
-\begin{figure}[htbp]
-  \centering
-  \includegraphics[width=0.6\textwidth]{./eps/filter}
-  \caption{The filter constructed from three digital patterns.}
-  \label{fig:filter}
-\end{figure}
+% \begin{figure}[htbp]
+%   \centering
+% ``  \includegraphics[width=0.6\textwidth]{./eps/filter}
+%   \caption{The filter constructed from three digital patterns.}
+%   \label{fig:filter}
+% \end{figure}
 
 Fig \ref{fig:filter} shows an example of the filter, assume that
 alphabet $\Sigma = \{0, 1, 2, \dots, 9\}$ and pattern set
@@ -389,12 +291,12 @@ sense that it is able to utilize all previous query results, which
 means the filter can filter out as many positions as possible in the
 text.
 
-\begin{figure}[htbp]
-  \centering
-  \includegraphics[width=0.6\textwidth]{./eps/filter_match}
-  \caption{Filter the positions in the text using the filter.}
-  \label{fig:f_match}
-\end{figure}
+% \begin{figure}[htbp]
+%   \centering
+%   \includegraphics[width=0.6\textwidth]{./eps/filter_match}
+%   \caption{Filter the positions in the text using the filter.}
+%   \label{fig:f_match}
+% \end{figure}
 
 As an example (see Fig \ref{fig:f_match}), consider the query bitmaps
 constructed above and assume that $T=23764614621$.  Initially, the
