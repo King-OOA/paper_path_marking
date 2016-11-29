@@ -132,92 +132,87 @@ paper and reviews some related works in the MLCS problem.
 \subsection{Definitions}
 \label{sec:definitions}
 
-Let $\Sigma$ represents a finite alphabet for the sequences, such as
-$\Sigma={A, C, T, G}$ for the DNA sequences.
+Let $\Sigma$ represent a finite alphabet for the sequences.  For
+example, for the DNA sequences, $\Sigma=\{A, C, T, G\}$.
 
 \textbf{Definition 1.} Let $s=c_1c_2...c_n$ be a sequence with length
-$n$ over $\Sigma$. A subsequence of $s$ is the one that can be
+$n$ over $\Sigma$. A \emph{subsequence} of $s$ is the one that can be
 obtained by deleting zero or more (not necessarily consecutive)
 characters from $s$. Formally, $s'=c_{i_1}c_{i_2}...c_{i_k}$ is called
-a subsequence of $s$, if $\forall j, 1< \leq j \leq k$:
-$1 \leq i_j \leq n$, and for all $r$ and $t$, $1 \leq r < t \leq k$:
-$i_r < i_t$.
+a subsequence of $s$, if for $1 \leq j \leq k$, there is
+$1 \leq i_j \leq n$, and for all $r$ and $t$, $1 \leq r < t \leq k$,
+there is $i_r < i_t$.\\
 
-\textbf{Definition 2.} Let $S={s_1, s_2, ..., s_d}$ be a set of
+\textbf{Definition 2.} Let $S=\{s_1, s_2, ..., s_d\}$ be a set of $d$
 sequences over $\Sigma$. A Longest Common Subsequence (\emph{LCS}) of
-$S$ is a sequence $a$ such that: 1. $a$ is a subsequence of all $s_i$
-, $1 \leq i \leq d$; 2. there is no sequence satisfying 1 and longer
-than $a$.
+$S$ is a sequence $lcs$ such that: (1) $lcs$ is a subsequence of all
+$s_i$ ($1 \leq i \leq d$); (2) there is no sequence satisfying (1) and
+longer than $lcs$.\\
 
-In general, given $d$ sequences over a finite alphabet $\Sigma$, there
-usually exists more than one LCS. For example, given three sequences
-$s_1 = ACTAGTGC$, $s_2 = TGCTAGCA$ and $s_3 = CATGCGAT$ over
-$\Sigma = {A, C, G, T}$, there are two LCS with length 4, which are
-$LCS_1 = CAGC$, $LCS_2 = CTGC$, respectively. The MLCS problem is to
-find all LCSs of three or more sequences. For two sequences, the
-problem is commonly called the LCS problem. Specific algorithms
-developed for LCS are generally inefficient for MLCS. Obviously, the
-LCS is a special case of the MLCS.
+In general, given $d$ sequences, there usually exists more than one
+LCS of the $d$ sequences. For example, given three sequences $s_1 =
+ACTAGTGC$, $s_2 = TGCTAGCA$ and $s_3 = CATGCGAT$, there are two LCSs
+with length 4, which are $lcs_1 = CAGC$, $lcs_2 = CTGC$,
+respectively. The MLCS problem is to find all LCSs of three or more
+sequences. For two sequences, the problem is commonly called the LCS
+problem. Obviously, the LCS is a special case of the MLCS. Specific
+algorithms developed for LCS are generally inefficient for MLCS.\\
 
-\textbf{Definition 3.} Let $S = {s_1, s_2, ..., s_d}$ be a set of
-sequences over $\Sigma$, and $s_i[j]$ be the $j-th$ character of
-$s_i$. A point $p = (p_1, p_2, ..., p_d)$ is called a \emph{match
-point} of $S$ if $s_1[p_1] = s_2[p_2] = ... = s_d[p_d] = \delta$,
-where $\delta$ is the character corresponding to the matched point
-$p$.
+\textbf{Definition 3.} Let $S = \{s_1,\, s_2,\, ...,\, s_d\}$ be a set
+of $d$ sequences over $\Sigma$, and $s_i[j]$ be the $j$-th character
+of $s_i$. A point $p = (p_1,\, p_2,\, ...,\, p_m)$ is called a
+\emph{match point} of $S$, if $s_1[p_1] = s_2[p_2] = ... = s_d[p_d] =
+\delta$, where $\delta$ is the symbol corresponding to the matched
+point $p$.\\
 
-
-\textbf{Definition 4.} Given two match points $p = {p_1, p_2, ...,
-p_d}$ and $q = {q_1, q_2, ..., q_d}$ of $S$, we say that $p = q$, if
-and only if $p_i = q_i$, for $1 \leq i \leq d$.  If for $1 \leq i \leq
-d$, there is $p_i \leq q_i$, we say $p$ dominates $q$, denoted as $p
-\preceq q$. Further, if for $1 \leq i \leq d$, there is $p_i < q_i$,
-we say $p$ strongly dominates $q$, denoted as $p \prec q$.
-
-
+\textbf{Definition 4.} Given two match points $p = (p_1,\, p_2,\,
+...,\, p_d)$ and $q = (q_1,\, q_2,\, ...,\, q_d)$ of $S$, we say that
+$p = q$, if and only if $p_i = q_i$ ($1 \leq i \leq d$). If $p_i \leq
+q_i$ ($1 \leq i \leq d$), we say $p$ \emph{dominates} $q$, denoted as
+$p \preceq q$. Further, if $p_i < q_i$ ($1 \leq i \leq d$), we say $p$
+\emph{strongly dominates} $q$, denoted as $p \prec q$.\\
 
 Because of the importance of PM, several efficient algorithms have
 been proposed in the past decades.
 
-\section{Notations}
-\label{sec:notations}
+\subsection{Dynamic Programming Based Algorithms}
+\label{sec:DP}
 
-Let $\Sigma$ be an \textsf{alphabet} consisting of a finite number of
-character symbols. (In this paper we will only focus on the case that
-$\Sigma$ is the ASCII character set, i.e. $|\Sigma| = 256$ and each
-character takes one byte memory.) Given the alphabet $\Sigma$, a
-\textsf{string} as well as its \textsf{substrings} over
-$\Sigma$ can be defined as follows:\\
-\\
-\textbf{Definition 1.} A \textsf{string} over $\Sigma$ is a sequence
-consisting of a finite number of characters from $\Sigma$. A
-length-$n$ string is represented by $S = c_1c_2..c_n$, where the
-$i$-th character of $S$ is: $S[i] = c_i \in \Sigma$
-$(1 \leq i \leq n)$. The length of $S$ is denoted by $|S|$. A
-\textsf{substring} of $S$ is a sequence consisting of any consecutive
-characters of $S$. The substring of $S$, which starts at
-position $i$ and has length $len$, is denoted by $S[i,\,len]$.\\
-\\
-Given a string $S$, its \textsf{prefix} and \textsf{suffix},
-which are both special substrings of $S$, are defined as follows:\\
-\\
-\textbf{Definition 2.} The length-$m$ \textsf{prefix} of a string $S$,
-which is denoted by $S^{+m}$, is the substring that consists of the
-first $m$ characters of $S$, i.e. $S^{+m}=S[1,\,m]$.  While the
-\textsf{suffix} of $S$ that starts at position $m+1$, is the substring
-left after removing the length-$m$ prefix of $S$. It is denoted by
-$S^{-m}$, i.e. $S^{-m} = S[m+1,\,|S|-m]$. (Particularly, a string $S$
-can be regarded as a prefix/suffix of itself, i.e. $S=S^{+|S|}=S^{-0}$.)\\
-\\
-Finally, the MSM problem can be defined as follows: \\
-\\
-\textbf{Definition 3.} Given a text string $T$ and a pattern set
-$P=\{p_1,\,p_2,\,\dots,\,p_k\}$, where $T$ and $p_i$
-$(1 \leq i \leq k)$ are all strings over $\Sigma$. The multi-string
-matching problem is to find all occurrences of every pattern of $P$ in
-$T$, more formally, to build the result set
-$R = \{(i,\, p_j)\;|\; p_j \in P\; and\,\; T[i,\,|p_j|]=p_j\}$.
+The classical exact algorithms for MLCS problem are based on dynamic
+programming \cite{Smith1981}, \cite{Sankoff1972}. Given $d$ sequences:
+$s_1,\, s_2,\,...,\, s_d$ with length $n_1,\, n_2,\, ...,\, n_d$
+respectively, these algorithms recursively construct a
+$n_1 \times n_2 \times ... \times n_d$ score table $T$, in which
+$T[i_1,\, i_2,\, ...,\, i_d]$ contains the length of the LCSs of the
+prefixes $s_1[1...i_1]$, $s_2[1...i_2]$, ..., $s_d[1...i_d]$.
+$T[i_1,\, i_2,\, ...,\, i_d]$ can be computed respectively by the
+following formula:
 
+\begin{equation*}
+  T[i_1,\, i_2,\, ...,\, i_d] = 
+  \begin{cases}
+    0 & \text{if $\exists j, 1 \leq j \leq d, i_j = 0$}\\
+    T[i_1-1,\, ...,\, i_d-1] + 1  & \text{if $s_1[i_1] = s_2[i_2] =
+      ... = s_d[i_d]$}\\
+    max(\bar{T}) & \text{otherwise}
+  \end{cases}
+\end{equation*}
+
+where
+$\bar{T} = \{T[i_1-1,\, i_2,\, ...,\, i_d],\, T[i_1,\, i_2-1,\, ...,\,
+i_d],\, ...,\, T[i_1,\, i_2,\, ...,\, i_d-1]\}$. Once the score table
+$T$ is constructed, all the MLCS can be collected by tracing back from
+the last item $T[n_1,\, n_2,\, ...,\, n_d]$ to the first item
+$T[0,\, 0,\, ...,\, 0]$. Fig. \ref{fig:DM} shows an example of score
+table $T$ for two sequences $s_1 = GATTACA$ and $s_2 = GTAATCTAAC$.
+Obviously, the time and space complexity of dynamic programming based
+algorithms for a MLCS problem with $d$ sequences of length $n$ are
+both $O(n^d)$ \cite{Hsu1984}, therefore, they can not be applied to
+MLCS problems with more than two sequences in practice. To reduce the
+complexity of dynamic programming based algorithms, various approaches
+have been proposed \cite{Hirschberg1977}, \cite{Apostolico1992},
+\cite{Masek1980}, \cite{Rick1994}. Unfortunately, these approaches
+primarily address the LCS problem of two sequences .
 
 \section{The Filter Module}
 \label{sec:filter}
@@ -1430,127 +1425,34 @@ Universities (BDZ021430).
 
 \begin{thebibliography}{99}
 
-\bibitem{Xue2015} Xue, Xingsi and Wang, Yuping, ``Optimizing ontology
-  alignments through a Memetic Algorithm using both MatchFmeasure and
-  Unanimous Improvement Ratio'', {\it ARTIFICIAL INTELLIGENCE}, 223,
-  pp.65-81, 2015.
+\bibitem{Smith1981} T.F. Smith and M.S. Waterman, “Identification of
+  Common Molecular Subsequences,” J. Molecular Biology, vol. 147,
+  pp. 195-197, 1981.
 
-\bibitem{Xue2016} Xue, Xingsi and Wang, Yuping, ``Using Memetic
-  Algorithm for Instance Coreference Resolution'', {\it IEEE
-    TRANSACTIONS ON KNOWLEDGE AND DATA ENGINEERING}, 223, pp.65-81,
-  2015.
+\bibitem{Sankoff1972} D. Sankoff, “Matching Sequences under
+Deletion/Insertion Con- straints,” Proc. Nat’l Academy Sciences USA,
+vol. 69, pp. 4-6, Jan.  1972.
 
-\bibitem{Kim2015} Kim, HyunJin and Choi, Kang-Il and Choi, Sang-Il,
-  ``A Memory-Efficient Deterministic Finite Automaton-Based Bit-Split
-  String Matching Scheme Using Pattern Uniqueness in Deep Packet
-  Inspection'', {\it PLOS ONE}, 10(5), 2015.
+\bibitem{Hsu1984} W.J. Hsu and M.W. Du, “Computing a Longest Common
+  Subsequence for a Set of Strings,” BIT Numerical Math., vol. 24,
+  no. 1, pp. 45-59, 1984.
+
+\bibitem{Hirschberg1977} D.S. Hirschberg, “Algorithms for the Longest Common Subse-
+quence Problem,” J. ACM, vol. 24, pp. 664-675, 1977
+
+\bibitem{Apostolico1992} A. Apostolico, S. Browne, and C. Guerra,
+  “Fast Linear-Space Com- putations of Longest Common Subsequences,”
+  Theoretical Com- puter Science, vol. 92, no. 1, pp. 3-17, 1992.
+
+\bibitem{Masek1980} W.J. Masek and M.S. Paterson, “A Faster Algorithm
+  Computing String Edit Distances,” J. Computer System Sciences,
+  vol. 20, pp. 18- 31, 1980.
+
+\bibitem{Rick1994} C. Rick, “New Algorithms for the Longest Common
+  Subsequence Problem,” Technical Report No. 85123-CS, Computer
+  Science Dept., Univ. of Bonn, Oct. 1994.
   
-\bibitem{Wu1994} Sun Wu and Udi Manber, ``A fast algorithm for
-  multi-pattern searching'', {\it Technical Report-94-17}, 1994.
 
-\bibitem{Lee2013} Tsern-Huei Lee and Nai-Lun Huang, ``A
-  pattern-matching scheme with high throughput performance and low
-  memory requirement'', {\it IEEE/ACM Transactions on Networking},
-  21(4), pp.1104--1116, 2013.
-
-\bibitem{Aho1975} Alfred V. Aho and Margaret J. Corasick, ``Efficient
-  string matching:An aid to bibliographic search'', {\it Commun. ACM}
-  18(6), pp.333-340, 1975.
-
-\bibitem{Knuth1977} Donald E. Knuth, Jr. James H. Morris, and Vaughan
-  R. Pratt, ``Fast pattern matching in strings'', {\it SIAM Journal on
-    Computing}, 6(2), pp.323–350, 1977.
-
-\bibitem{Boyer1977} Robert S. Boyer and J. Strother Moore, ``A fast
-  string searching algorithm'', {\it Commun. ACM}, 20(10), pp.762–772,
-  1977.
-
-\bibitem{Tuck2004} N. Tuck, T. Sherwood, B. Calder, and G. Varghese,
-  ``Deterministic memory-efficient stringmatching algorithms for
-  intrusion detection'', {\it Twenty-third AnnualJoint Conference of
-    the IEEE Computer and Communications Societies}, Vol 4,
-  pp.2628–2639, 2004.
-
-\bibitem{Bremler2011} A. Bremler-Barr, Y. Harchol, and D. Hay,
-  ``Space-time tradeoffs in software-based deep packet inspection'',
-  {\it In High Performance Switching and Routing (HPSR), IEEE 12th
-    International Conference on}, pp.1–8, 2011.
-
-\bibitem{Ramakrishnan2010} Ramakrishnan Kandhan, Nikhil Teletia, and
-  Jignesh M. Patel, ``Sigmatch: Fast and scalable multi-pattern
-  matching'', {\it Proceedings of the VLDB Endowment}, 3(1),
-  pp.1173–1184, 2010.
-
-\bibitem{Zhou2007} Zongwei Zhou, Yibo Xue, Junda Liu, Wei Zhang, and
-  Jun Li, ``MDH: A high speed multi-phase dynamic hash string matching
-  algorithm for large-scale pattern set'', {\it Information and
-    Communications Security Springer}, pp.201-215, 2007.
-
-
-\bibitem{Zhan2014} P. Zhan, W. Yuping, and X. Jinfeng, ``An improved
-  multi-pattern matching algorithm for large-scale pattern sets'',
-  {\it In Computational Intelligence and Security (CIS), Tenth
-    International Conference on}, pp.197–200, 2014.
-
-\bibitem{Zhang2009} Baojun Zhang, Xiaoping Chen, Xuezeng Pan, and
-  Zhaohui Wu, ``High concurrence wu-manber multiple patterns matching
-  algorithm'', {\it Proceedings of the International Symposium on
-    Information Proces}, pp.404-409, 2009.
-
-\bibitem{Choi2011} Yoon-Ho Choi, Moon-Young Jung, and Seung-Woo Seo,
-  ``A fast pattern matching algorithm with multi-byte search unit for
-  highspeed network security'', {\it Computer Communications}, 34(14),
-  pp.1750–1763, 2011.
-
-\bibitem{Le2013} Hoang Le and V.K. Prasanna, ``A memory-efficient and
-  modular approach for large-scale string pattern matching'', {\it
-    Computers, IEEE Transactions on}, 62 (5), pp.844–857, 2013.
-
-\bibitem{Moraru2013} Iulian Moraru and David G. Andersen, ``Exact
-  pattern matching with feed-forward bloom filters'', {\it Journal of
-    Experimental Algorithmics}, Vol.17, pp.3-4, 2013.
-
-\bibitem{Karp1987} R. M. Karp and M. O. Rabin, ``Efficient randomized
-  patternmatching algorithms'', {\it IBM Journal of Research and
-    Development}, 31 (2), pp.249-260, 1987.
-
-\bibitem{Agarwal2013} K. Agarwal and R. Polig, ``A high-speed and
-  large-scale dictionary matching engine for information extraction
-  systems'',{\it Application-Specific Systems, Architectures and
-    Processors (ASAP), IEEE 24th International Conference on},
-  pp.59–66, 2013.
-
-\bibitem{Zhang2015} Hongli Zhang, Dongliang Xu, Zhihong Tian, and
-  Yujian Fan, ``An efficient parallel algorithm for exact
-  multi-pattern matching'', {\it Security And Communication Networks},
-  8 (9), pp.1688–1697, 2015.
-
-\bibitem{I2015} Tomohiro I, Takaaki Nishimoto, Shunsuke Inenaga, Hideo
-  Bannai, and Masayuki Takeda, ``Compressed automata for dictionary
-  matching'', {\it Theoretical Computer Science}, Vol.578, pp.30–41,
-  2015.
-
-\bibitem{Khancome2013} Chouvalit Khancome and Veera Boonjing, ``A new
-  linear-time dynamic dictionary matching algorithm'', {\it Computing
-    And Informatics}, 32 (5), pp.897–923, 2013.
-
-\bibitem{Amir2015} Amihood Amir, Avivit Levy, Ely Porat, and B. Riva
-  Shalom, ``Dictionary matching with a few gaps'', {\it Theoretical
-    Computer Science}, Vol.589, pp.34–46, 2015.
-
-\bibitem{Neuburger2012} Shoshana Neuburger and Dina Sokol. ``Succinct
-  2d dictionary matching'', {\it Algorithmica}, 65 (3), pp.662–684,
-  2012.
-
-\bibitem{Leis2013} V. Leis, A. Kemper, and T. Neumann. ``The adaptive
-  radix tree: Artful indexing for main-memory databases'', {\it In
-    Data Engineering(ICDE), IEEE 29th International Conference on},
-  pp.38–49, 2013.
-
-\bibitem{Ramakrishna1997} M. V. Ramakrishna and Justin
-  Zobel. ``Performance in practice of string hashing functions'', {\it
-    In Proceedings of the Fifth International Conference on Database
-    Systems for Advanced Applications (DASFAA)}, pp.215–224, 1997.
 
 \bibitem{pizzachil} {\it http://pizzachil.dcc.uchile.cl/}
 
@@ -1561,7 +1463,7 @@ Universities (BDZ021430).
 %\vspace*{-0.3in}
 \noindent
 \rule{12.6cm}{.1mm}
-
+pp
 \end{document}
 
 %%% Local Variables:
