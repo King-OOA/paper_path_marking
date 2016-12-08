@@ -129,9 +129,6 @@ of the new algorithms with existing ones are presented. In Section
 In this section, we define some notations and terminology used in this
 paper and reviews some related works in the MLCS problem.
 
-\subsection{Definitions}
-\label{sec:definitions}
-
 Let $\Sigma$ represent a finite alphabet for the sequences.  For
 example, for the DNA sequences, $\Sigma=\{A, C, T, G\}$.
 
@@ -158,34 +155,21 @@ sequences. For two sequences, the problem is commonly called the LCS
 problem. Obviously, the LCS is a special case of the MLCS. Specific
 algorithms developed for LCS are generally inefficient for MLCS.\\
 
-\textbf{Definition 3.} Let $S = \{s_1,\, s_2,\, ...,\, s_d\}$ be a set
-of $d$ sequences over $\Sigma$, and $s_i[j]$ be the $j$-th character
-of $s_i$. A point $p = (p_1,\, p_2,\, ...,\, p_m)$ is called a
-\emph{match point} of $S$, if $s_1[p_1] = s_2[p_2] = ... = s_d[p_d] =
-\delta$, where $\delta$ is the symbol corresponding to the matched
-point $p$.\\
 
-\textbf{Definition 4.} Given two match points $p = (p_1,\, p_2,\,
-...,\, p_d)$ and $q = (q_1,\, q_2,\, ...,\, q_d)$ of $S$, we say that
-$p = q$, if and only if $p_i = q_i$ ($1 \leq i \leq d$). If $p_i \leq
-q_i$ ($1 \leq i \leq d$), we say $p$ \emph{dominates} $q$, denoted as
-$p \preceq q$. Further, if $p_i < q_i$ ($1 \leq i \leq d$), we say $p$
-\emph{strongly dominates} $q$, denoted as $p \prec q$.\\
+Because of the importance of the MLCS problem, several efficient
+algorithms have been proposed in the past decades.
 
-Because of the importance of PM, several efficient algorithms have
-been proposed in the past decades.
-
-\subsection{Dynamic Programming Based Algorithms}
-\label{sec:DP}
+\subsection{Dynamic Programming Based Approaches}
+\label{sec:Dynamic Programming}
 
 The classical exact algorithms for MLCS problem are based on dynamic
 programming \cite{Smith1981}, \cite{Sankoff1972}. Given $d$ sequences:
 $s_1,\, s_2,\,...,\, s_d$ with length $n_1,\, n_2,\, ...,\, n_d$
-respectively, these algorithms recursively construct a
-$n_1 \times n_2 \times ... \times n_d$ score table $T$, in which
-$T[i_1,\, i_2,\, ...,\, i_d]$ contains the length of the LCSs of the
-prefixes $s_1[1...i_1]$, $s_2[1...i_2]$, ..., $s_d[1...i_d]$.
-$T[i_1,\, i_2,\, ...,\, i_d]$ can be computed respectively by the
+respectively, these approaches recursively construct a
+$n_1 \times n_2 \times ... \times n_d$ dimension score table $T$, in
+which $T[i_1,\, i_2,\, ...,\, i_d]$ contains the length of the LCSs of
+the prefixes $s_1[1...i_1]$, $s_2[1...i_2]$, ..., $s_d[1...i_d]$.
+$T[i_1,\, i_2,\, ...,\, i_d]$ can be computed recursively by the
 following formula:
 
 \begin{equation*}
@@ -198,1207 +182,138 @@ following formula:
   \end{cases}
 \end{equation*}
 
-where
-$\bar{T} = \{T[i_1-1,\, i_2,\, ...,\, i_d],\, T[i_1,\, i_2-1,\, ...,\,
-i_d],\, ...,\, T[i_1,\, i_2,\, ...,\, i_d-1]\}$. Once the score table
-$T$ is constructed, all the MLCS can be collected by tracing back from
-the last item $T[n_1,\, n_2,\, ...,\, n_d]$ to the first item
-$T[0,\, 0,\, ...,\, 0]$. Fig. \ref{fig:DM} shows an example of score
-table $T$ for two sequences $s_1 = GATTACA$ and $s_2 = GTAATCTAAC$.
-Obviously, the time and space complexity of dynamic programming based
-algorithms for a MLCS problem with $d$ sequences of length $n$ are
-both $O(n^d)$ \cite{Hsu1984}, therefore, they can not be applied to
-MLCS problems with more than two sequences in practice. To reduce the
-complexity of dynamic programming based algorithms, various approaches
-have been proposed \cite{Hirschberg1977}, \cite{Apostolico1992},
-\cite{Masek1980}, \cite{Rick1994}. Unfortunately, these approaches
-primarily address the LCS problem of two sequences .
+where $\bar{T} = \{T[i_1-1,\, i_2,\, ...,\, i_d],\, T[i_1,\, i_2-1,\,
+...,\, i_d],\, ...,\, T[i_1,\, i_2,\, ...,\, i_d-1]\}$. Once the score
+table $T$ is constructed, all the MLCS can be collected by tracing
+back from the last cell $T[n_1,\, n_2,\, ...,\, n_d]$ to the first
+cell $T[0,\, 0,\, ...,\, 0]$. Fig. \ref{fig:DM} shows an example of
+score table $T$ for two sequences $s_1 = GATTACA$ and $s_2 =
+GTAATCTAAC$.  Obviously, the time and space complexity of dynamic
+programming based approaches for a MLCS problem with $d$ sequences of
+length $n$ are both $O(n^d)$ \cite{Hsu1984}, therefore, they can not
+be applied to MLCS problems with more than two sequences in
+practice. To reduce the complexity of dynamic programming based
+approaches, various approaches have been proposed
+\cite{Hirschberg1977}, \cite{Apostolico1992}, \cite{Masek1980},
+\cite{Rick1994}. Unfortunately, these approaches primarily address the
+LCS problem of two sequences.
+
+\subsection{Dominant Point Based Approaches}
+\label{sec:Dominant Point}
+
+In order to illustrate the dominant point based approaches, we
+introduce some terminologies first:
+
+\textbf{Definition 3.} Let $S = \{s_1,\, s_2,\, ...,\, s_d\}$ be a set
+of $d$ sequences over $\Sigma$, and $s_i[j]$ be the $j$-th character
+of $s_i$. A point $p = (p_1,\, p_2,\, ...,\, p_d)$ is called a
+\emph{match point} of $S$, if $s_1[p_1] = s_2[p_2] = ... = s_d[p_d] =
+\delta$, where $\delta$ is the symbol corresponding to the matched
+point $p$. The character corresponding to the match point $p$ is
+denoted as $C(p)$.\\
+
+\textbf{Definition 4.} Given two match points $p = (p_1,\, p_2,\,
+...,\, p_d)$ and $q = (q_1,\, q_2,\, ...,\, q_d)$ of $S$, we say that
+$p = q$, if and only if $p_i = q_i$ ($1 \leq i \leq d$). If $p_i \leq
+q_i$ ($1 \leq i \leq d$), we say $p$ \emph{dominates} $q$, denoted as
+$p \preceq q$. Further, if $p_i < q_i$ ($1 \leq i \leq d$), we say $p$
+\emph{strongly dominates} $q$, denoted as $p \prec q$.  If $p \prec q$
+and there is no match point $r$ such that $p \prec r \prec q$ and
+$C(q) = C(r)$, we call $q$ a \emph{successor} of $p$, or $p$ a
+\emph{precursor} of $q$. Obviously, one match point has at most
+$|\Sigma|$ successors with each character in $\Sigma$ corresponds to
+one successor. \\
+
+\textbf{Definition 5.} The \emph{level} of a match point $p = (p_1,\,
+p_2,\, ...,\, p_d)$ is defined to be $L(p) = T[p_1,\, p_2,\, ...,\,
+p_d]$, where $T$ is the score table constructed in the dynamic
+programming methods. A match point $p$ is called a \emph{k-dominant
+point} (\emph{k-dominants} for short) if and only if: (1) $L(p) = k$;
+(2) there is no other match point $q$ such that: $L(q) = k$ and $q
+\preceq q$. All the $k$-dominants forms a set denoted as $D^k$.
+
+The motivation of the dominant point based approaches is to reduce the
+time and space complexity of the basic dynamic programming
+methods. The key idea is based on the observation that only the
+dominant points contributes to the construction of the MLCS. Since the
+number of dominant points can be much smaller than that of all cells
+in the score table $T$, a dominant point approach that only identifies
+the dominant points, without filling the whole score table, can
+greatly reduce the time and space complexity.
+
+The search space of the dominant point based approaches can be
+organized into a Directed Acyclic Graph (DAG): a node in DAG
+represents a match point and an edge $<p,\, q>$ in DAG represents
+$p \prec q$ and $L(q) = L(p) + 1$, i.e., $q$ is a successor of $p$. A
+node in DAG has at most $|\Sigma|$ successors. Initially, the DAG
+contains a source node $(0,\, 0,\, ...,\, 0)$ with no incoming edges
+and an end node $(\infty,\, \infty,\, ...,\, \infty)$ with no outgoing
+edges, in particular, the end node is defined as the successor of
+those nodes without an successor. The DAG can be constructed level by
+level as follows: at first, let $k = 0$ (the level), and
+$D^0 = \{(0,\, 0,\, ...,\, 0)\}$. Next, with a forward iteration
+procedure, the $(k+1)$-dominants $D^{k+1}$ are computed based on the
+$k$-dominants $D^k$. Specifically, each node in $D^k$ is expanded by
+generating all its $|\Sigma|$ successors first, then an pruning
+operation called $Minima$ is performed to identify those successors
+who dominants others, and only these dominants are reserved to form
+$D^{k+1}$. This procedure is denoted as $D^k \rightarrow D^{k+1}$.
+Once all the nodes in DAG have been expanded, the whole DAG is
+constructed. In the DAG, a longest path from the source node to the
+end node corresponds to a LCS. Thus the MLCS problem becomes finding
+all the longest paths from the source node to the end node.The main
+drawback of the dominant point based approaches is that the $Minima$
+operation needs to compare among the nodes dimension by dimension,
+which is very time consuming. Figure shows an example of the dominant
+based algorithm processing three sequence.
+
+Hunt \cite{Hunt1977} proposed the first dominant point based algorithm
+for two sequences with time complexity $O((r+n)log^n)$, where $r$ is
+the number of all nodes in DAG, and $n$ is the length of the two
+sequences. Afterwards, to further improve the efficiency, a variety of
+dominant point based LCS/MLCS algorithms have been presented. Korkin
+\cite{Korkin2001} proposed the first MLCS algorithm with time
+complexity $O(|\Sigma|d)$, where $d$ is the number of sequences. Chen
+\cite{Chen2006} presented an efficient MLCS algorithm -- FAST-LCS for
+DNA sequences, it introduced a novel successor table to obtain the
+successors of nodes in constant time and used a pruning operation to
+eliminate the non-dominant nodes in each level. Wang \cite{Wang2011}
+improved the FAST-MLCS algorithm by using a divide-and-conquer
+strategy to eliminate the non-dominant nodes, which is very suitable
+for parallelization, it indicates that the parallelized algorithm
+Quick-DPPAR has gained a near-linear speedup with respect to its
+serial version. It is worth mentioning that Li \cite{Li2012} and Yang
+\cite{Yang2010} made attempts to develop efficient parallel algorithms
+on GPUs for the LCS problem and on cloud platform for the MLCS
+problem, respectively. Unfortunately, Yang \cite{Yang2010} is not
+suitable for the general MLCS problem for multiple sequences due to
+the large synchronous cost. Recently, Li \cite{LiICDE} and Linear
+\cite{LIKDD} proposed two algorithms: PTop-MLCS and RLP-MLCS based on
+dominant point, these algorithms used a novel graph model called
+Non-redundant Common Subsequence Graph (NCSG) which can greatly reduce
+the redundant nodes during processing, and adopt a two-passes
+topological sorting procedure to find the MLCS. The authors claimed
+that the time complexity of the proposed algorithms is linear to the
+number of nodes in NCSG.
+
+For large-scale MLCS problems in practice, the traditional algorithms
+usually need a long time and large space to find the optimal solution
+(the real MLCS), to address this, approximate algorithms have been
+developed to quickly produce a suboptimal solution (partial MLCS) and
+gradually improve it when given more time, until an optimal one is
+found. Yang \cite{Yang2013} proposed an approximate algorithm Pro-MLCS
+and its efficient parallelization based on the dominant point
+model. Pro-MLCS can find an approximate solution quickly, which only
+takes around 3 percent of the entire running time, and then
+progressively generate better solutions until obtaining the optimal
+one. Recently, Yang \cite{Yang2014} proposed another two approximate
+algorithms SA-MLCS and SLA-MLCS, SA-MLCS uses an iterative beam
+widening search strategy to reduce space usage during the iterative
+process of finding better solutions. Based on SA-MLCS, SLA-MLCS, a
+space-bounded algorithm, is developed to avoid space usage from
+exceeding available memory.
 
-\section{The Filter Module}
-\label{sec:filter}
 
-As mentioned before, our engine consists of a filter module and a
-verification module. In this section, we introduce the former, while
-in the next section the latter will be illustrated.
-
-The filter we adopted in our engine is proposed by \cite{Lee2013},
-which is an improvement of the filter in the WM algorithm. Given the
-pattern set, as in the WM algorithm, only the length-$lsp$ prefix of
-each pattern are considered in constructing the filter, where $lsp$ is
-the \emph{length of the shortest pattern} in the pattern set. Similar
-to WM, the filtering is based on character blocks (a character block
-is merely a short string consisting of only a few characters) rather
-than single character. Assuming that each block consists of $k$
-characters, the filter will include $lsp-k+1$ membership query bitmaps
-denoted as $B_1$, $B_2$, \dots, and $B_{lsp-k+1}$, where each bitmap
-is a vector of $N$ bits. Let $B_j[i]$, $0 \leq i \leq N - 1$,
-$1 \leq j \leq lsp-k+1$, be the $i$-th bit of the $j$-th query bitmap,
-and $B_j[i]$ is set to 1 iff there exists a pattern $p_m$ such that
-$hash(p_m[j,k]) = i$ ($p_m[j,k]$ is a $k$-symbol block starting at
-position $j$ of $p_m$), where $hash$ is a hash function that maps a
-$k$-symbol block to an integer in the range of $[0, N-1]$.
-
-% \begin{figure}[htbp]
-%   \centering
-% ``  \includegraphics[width=0.6\textwidth]{./eps/filter}
-%   \caption{The filter constructed from three digital patterns.}
-%   \label{fig:filter}
-% \end{figure}
-
-Fig \ref{fig:filter} shows an example of the filter, assume that
-alphabet $\Sigma = \{0, 1, 2, \dots, 9\}$ and pattern set
-$P = \{p_1,\; p_2,\; p_3\}$, where $p_1 = 04648753$, $p_2 = 30692$,
-and $p_3 = 614621$.  Obviously, $lsp = |p_2|= 5$. Assume that $k = 2$,
-$N = 100$, and the hash function is the identity mapping. For such a
-setting, there are $lsp - k + 1 = 4$ query bitmaps, i.e. $B_1$, $B_2$,
-$B_3$, $B_4$, and in particular, we have $B_1[i] = 1$ iff $i$ = 4, 30,
-or 61; $B_2[i] = 1$ iff $i$ = 6, 14, or 46; $B_3[i] = 1$ iff $i$ = 46,
-64, or 69; and $B_4[i] = 1$ iff $i$ = 48, 62, or 92.
-
-Once the query bitmaps have been constructed, they can be used to
-filter the positions of the input text string. During filtering, a
-sliding window $W$ of length $lsp$ is adopted to select a segment of
-the text string $T$. Initially, $W$ is aligned with the beginning of
-$T$, so that the substring of $T$ contained in $W$ is $T[1,lsp]$.
-Generally, assume that $W$ is moved to the $i$-th position of $T$, and
-the substring of $T$ contained in $W$ is $T[i,lsp]$. Then the last
-$k$-symbol block of $T[i,lsp]$, which is $T[i+lsp-k, k]$, is used to
-query all the bitmaps. Let single bit $qb_j$ be the report of $B_j$
-($1 \leq j \leq lsp - k + 1$), and $qb_j=1$ iff
-$B_j[hash(T[i+lsp-k,k])] = 1$. Let bitmap
-$QB = qb_1qb_2 \dots qb_{lsp-k+1}$ to denote the current query result
-and another \emph{master bitmap} $MB = mb_1mb_2 \dots mb_{lsp-k+1}$ to
-accumulate the previous query results and act as the current state of
-the filter. Initially, all the bits of $MB$ are set to 1. After
-fetching a query result $QB$, the master bitmap is updated by
-$MB = MB \; \& \; QB$, where \& is the bit-wised ``and''
-operation. For the updated $MB$, if $mb_{lsp-k+1} = 1$, position $i$
-is considered as a potential matched position and the verification
-module is invoked. Otherwise, the sliding window $W$ is advanced by
-$lsp-k+1$ positions if all the bits of $MB$ are 0's, or $lsp-k+1-r$
-positions if $mb_r=1$ and $mb_i=0$, for $r < i \leq lsp-k$. The
-positions skipped by $W$ are filtered out. If $W$ is determined to be
-advanced by $h$ positions, $MB$ is right-shifted by $h$ bits and
-filled with 1's for the holes left by the shift. Particularly, it is
-proved in \cite{Lee2013} that the filter using master bitmap and
-simple bit-wised ``and'' and ``shift'' operations is optimal in the
-sense that it is able to utilize all previous query results, which
-means the filter can filter out as many positions as possible in the
-text.
-
-% \begin{figure}[htbp]
-%   \centering
-%   \includegraphics[width=0.6\textwidth]{./eps/filter_match}
-%   \caption{Filter the positions in the text using the filter.}
-%   \label{fig:f_match}
-% \end{figure}
-
-As an example (see Fig \ref{fig:f_match}), consider the query bitmaps
-constructed above and assume that $T=23764614621$.  Initially, the
-matching window $W$ contains 23764 and $MB = 1111$.  The last 2-symbol
-block of $W$, i.e. 64, is used for the first query, and the query
-result is $QB=0010$. Since $MB\; \&\; QB = 0010$, $W$ is advanced by 1
-position (which means the first position of $T$ is filtered out), and
-then $MB$ is updated as $1001$ by right shift. For the second
-position, the substring contained in $W$ is 37646. This time, block 46
-is used to query the bitmaps and the query result is $QB=0110$. Since
-$MB\; \& \; QB=0000$, $W$ moves forward by 4 positions to position 6
-(which means positions $2 \sim 5$ are filled out), and $MB$ is updated
-as 1111. For position 6, $W$ contains 61462 and block 62 is used for
-querying and fetches $QB = 0001$. Since $MB\; \& \; QB = 0001$,
-position 6 is a potential matched position, and thus, the verification
-module is invoked. After checking, the pattern $p_3=614621$ is
-detected at position 6. Then, $W$ is advanced by 4 positions to
-position 10. However, since the length of the remaining input text in
-$W$, i.e. 21, is smaller than $lsp$, which means there can not be any
-pattern starting at that position, the whole scanning procedure is
-terminated.
-
-\section{The verification module}
-\label{sec:verification}
-
-The verification module is the core of the whole matching engine,
-since it determines the worst case performance of the engine. The
-verification module in our engine is based on a new data structure
-called \emph{Adaptive Matching Tree} (AMT) which is a modification of
-the classical \emph{trie} structure. Like the \emph{trie}, but in a
-more flexible and space efficient way, the AMT enables a fast
-membership query which decides whether a given target string exists in
-the pattern set. In the next subsections, we will introduce the
-construction of the AMT and some further optimization techniques.
-
-\subsection{AMT Construction}
-\label{subsec:amt}
-
-The AMT is constructed from the pattern set, and in general, this
-construction includes five major steps:
-
-\begin{enumerate}
-\item Create a suffix set $SF$, and put each pattern in the pattern
-  set into $SF$, where each pattern is regarded as a suffix of itself.
-\item Compute the \emph{length of the shortest suffix} ($lss$) in
-  $SF$. For each suffix in $SF$, remove its length-$lss$ prefix, and
-  all the removed prefixes form a prefix set $PF$. Discard the
-  repetitions in $PF$, and calculate $|PF|$ which refers to the
-  \emph{number of distinct prefixes} ($ndp$).
-\item Create a tree \emph{node} to hold the prefixes in $PF$. The
-  \emph{node} is actually an index, in which each prefix serves as a
-  key. The inner structure of the \emph{node} is constructed
-  adaptively according to $ndp$ and $lss$ that have been computed in
-  step 2.
-\item Divide $SF$ by putting together all the suffixes with the same
-  prefix removed, to form a sub-suffix-set. Associate each
-  sub-suffix-set with the corresponding prefix in the tree
-  \emph{node}.
-\item For each newly created sub-suffix-set in step 3, repeat the same
-  procedure from step 2.
-\end{enumerate}
-
-\begin{figure}[htbp]
-  \centering
-  \includegraphics[width=\textwidth]{./eps/AMT}
-  \caption{Constructing the AMT from a pattern set. Each arrow
-    in the AMT indicates a child pointer.}
-  \label{fig:AMT}
-\end{figure}
-
-As an example, Figure \ref{fig:AMT} shows the construction of AMT from
-a pattern set $P = \{p_1,\, p_2,\, \dots,\, p_{13}\}$. Note that,
-since each pattern is a suffix of itself, the whole pattern set $P$
-can be regarded as a suffix set $SF$.  First, since $p_6$ is the
-shortest pattern(suffix) in $P$, we have $lss = |p_6| = 2$. Then the
-length-2 prefix of each pattern(suffix) is removed, and the removed
-prefixes form a prefix set:
-$PF = \{p_1^{+2} = aa,\; p_2^{+2} = aa,\; \dots,\; p_{13}^{+2} =
-cc\}$.  After discarding the repetitions in $PF$, only 3 distinct
-prefixes are left: $PF = \{aa,\, bb,\, cc\}$, and we have
-$ndp = |PF| = 3$.
-
-Then the first tree node, which is actually the root of AMT, is
-created to hold the prefixes in $PF$. Each prefix serves as a
-\emph{key} in the root and has a pointer (initialized to $NULL$) which
-will be used to associate with the child node in the future. As will
-be seen latter, the structure of root is selected adaptively according
-to two parameters: $lss=2$ and $ndp=3$.
-
-After creation of the root, the suffixes left in $P$ are grouped based
-on their lost 2-symbol prefixes: those suffixes having the same
-prefixes removed are grouped together to form a sub-suffix-set. In
-order to record the correspondence between the sub-suffix-set and the
-lost prefix, the tuple (\emph{node.key,\; sub-suffix-set}) is used:
-the suffixes in the \emph{sub-suffix-set} have the same prefix
-\emph{key} removed, where the \emph{key} is held as a key in the newly
-created \emph{node}. Using this notation, there are three tuples
-created after grouping the suffixes left in $P$:
-$tp_1 = (root.aa,\; SF_1=\{p_1^{-2},\, p_2^{-2},\, p_3^{-2},\,
-p_4^{-2},\, p_5^{-2},\, p_7^{-2}\})$,\,
-$tp_2 = (root.bb,\; SF_2=\{p_8^{-2},\, p_9^{-2},\, p_{10}^{-2}\})$ and
-$tp_3 = (root.cc,\; SF_3=\{p_{11}^{-2},\, p_{12}^{-2},\,
-p_{13}^{-2}\})$. This indicates that $P$ is divided into three
-sub-suffix-sets: $SF_1$, $SF_2$, $SF_3$, and each sub-suffix-set
-corresponds to a prefix held as a key in the root (it also means that
-the root may have three child nodes). Note that, the shortest
-suffix(pattern) $p_6$ has disappeared in the sub-suffix-sets, since
-after removing the length-2 prefix of $p_6$, there is nothing left.
-
-The same procedure is repeated on each of the three created
-sub-suffix-sets. As a further example, $SF_1$ of $tp_1$ is
-processed. First, since $lss = |p_7^{-2}| = 6$, the length-$6$ prefix
-of each suffix in $SF_1$ is removed to form a prefix set:
-$PF_1 = \{(p_1^{-2})^{+6},\, (p_2^{-2})^{+6},\, (p_3^{-2})^{+6},\,
-(p_4^{-2})^{+6},\, (p_5^{-2})^{+6},\, (p_7^{-2})^{+6}\}$. After
-discarding the duplicates in $PF_1$, only three distinct prefixes are
-left: $PF_1 = \{a^6,\, e^6,\, b^6\}$ (we use the notation $c^n$ to
-denote a length-$n$ string consisting of the same character $c$).
-Then a new tree node $node_1$ is built adaptively upon $PF_1$ to hold
-its prefixes as keys.  According to the first component of $tp_1$
-(i.e. $root.aa$), $node_1$ is associated with the key $aa$ in the root
-by a child pointer, which makes it to be the first child of root. Once
-again, the suffixes left in $SF_1$ are grouped based on their lost
-length-6 prefixes, which formed three new tuples:
-$tp_4 = (node_1.a^6,\; SF_4=\{p_1^{-8}\})$,
-$tp_5 = (node_1.e^6,\; SF_5=\{p_2^{-8},\, p_3^{-8},\, p_4^{-8}\})$ and
-$tp_6 = (node_1.b^6,\; SF_6=\{p_5^{-8}\})$.
-
-Note that, in order to mark the end of a pattern, once the last part
-of the pattern has been removed and then stored in a node, that last
-part is marked with an asterisk(*) in the corresponding node. As a
-result of this, any path from the root to a key that marked with an
-asterisk represents a complete pattern. It can be seen that, the
-patterns are stored implicitly in the AMT and can be reconstructed
-from the paths ended with an asterisk.
-
-During the construction of AMT, we use a \emph{breadth-first} strategy
-to process the sub-suffix-sets and create tree nodes (which means the
-next sub-suffix-set to be processed is $SF_2$ rather than $SF_4$). For
-the purpose of tracing the order in which the sub-suffix-sets are
-processed, a \emph{first-in-first-out} queue is employed to maintain
-the created tuples. The tuple at the beginning of the queue contains
-the sub-suffix-set that will be processed next, while the newly
-created tuples are inserted to the end of the queue in order. In our
-example, the root node is built initially, then $tp_1$, $tp_2$ and
-$tp_3$ are inserted to the queue. Next $SF_1$ of $tp_1$ is processed
-and the newly created tuples $tp_4$, $tp_5$ and $tp_6$ are inserted to
-the queue in order. Subsequently, $SF_2$, $SF_3$, $SF_4$, $SF_5$,
-$SF_6$, $\dots$ are processed in sequence. Once there is no tuple left
-in the queue, the whole AMT has been constructed.
-
-\begin{algorithm}
-  \caption{Constructing the AMT}\scriptsize
-  \label{alg:amt}
-  \begin{algorithmic}[1]
-    \REQUIRE The pattern set $P$
-    \ENSURE The corresponding AMT
-    \STATE
-    \STATE $Q \leftarrow$ Create an empty queue
-    \STATE $push\_queue((NULL,\,P),\; Q)$
-    \STATE
-    \WHILE{$Q$ is not empty}
-    \STATE $(parent\_node.key,\; SF) \leftarrow pop\_queue(Q)$
-    \STATE $lss \leftarrow$ The length of the shortest pattern in $SF$
-    \FOR{each $suf \in SF$}
-    \IF{$|suf|=lss$}
-    \STATE Mark $suf^{+lss}$ to be the pattern end
-    \ENDIF
-    \STATE Remove $suf^{+lss}$ of $suf$, and put $suf^{+lss}$ into $PF$
-    \ENDFOR
-    \STATE Discard the repetitions in $PF$, and let $ndp \leftarrow |PF|$
-    \STATE According to $lss$ and $ndp$, adaptively create a
-    $new\_node$ to hold the prefixes in
-    $PF$
-    \IF{$(parent\_node.key = NULL)$}
-    \STATE $root \leftarrow new\_node$
-    \ELSE
-    \STATE Associate $new\_node$
-    with $parent\_node.key$ by a child pointer
-    \ENDIF
-    \STATE $TP \leftarrow \{(new\_node.pf,\, SSF) \mid SSF \subseteq SF\; and
-    \ \forall \ p,\,q \in SSF: p,\,q$ have the same length-$lss$ prefix
-    $pf$ removed\}\
-    \FOR{each $tp \in TP$}
-    \STATE $push\_queue(Q,\,tp)$
-    \ENDFOR
-    \ENDWHILE
-    \STATE
-    \RETURN $root$.
-  \end{algorithmic}
-\end{algorithm}
-
-The framework of constructing the AMT from a pattern set is
-illustrated in Algorithm \ref{alg:amt}. Firstly, an empty queue $Q$ is
-created in line 2 for maintaining the tuples. Then the tuple
-$(NULL, P)$ is inserted to $Q$ in line 3 by function $push\_queue$
-which always inserts an element to the end of the queue. Since $P$ is
-the initial pattern set here, the first component of the tuple is
-$NULL$, which means there is no prefix removed from $P$ yet. By this
-way, the creation of the root can be combined with the creation of
-other tree nodes in the following \textbf{while} loop.
-
-If $Q$ is not empty, the \textbf{while} loop body from line 5 to line
-25 constructs a tree node based on the first tuple in $Q$. The tuple
-at the beginning of $Q$ is fetched by the $pop\_queue(Q)$ function in
-line 6: the suffix set to be processed is assigned to $SF$, and the
-corresponding prefix of $SF$ in the parent node is denoted by
-$parent\_node.key$. Then the $lss$ of $SF$ is computed in line 7. In
-the inner \textbf{for} loop from line 8 to line 13, the length-$lss$
-prefix of each suffix in $SF$ is removed, and the prefixes are
-collected to form the prefix set $PF$. If a prefix is the last part of
-some pattern, it is marked as a pattern end. Line 14 discards the
-repetitions in $PF$, after that, a new tree node is created adaptively
-to hold the prefixes $PF$ in line 15. The \textbf{if} statement in
-line 16 decides whether the newly created node is the root node or
-not: if the prefix component of the current tuple is $NULL$, the new
-node is the root node as stated before; otherwise, the new node is a
-child node which will be then associated with the corresponding prefix
-in its parent node. Next in line 21, the suffixes left in $SF$ are
-grouped based on their lost prefixes, and each group and the
-corresponding prefix forms a tuple. Finally, the created tuples are
-inserted orderly to the end of $Q$ by the $push\_queue$ function. Once
-there is no tuple left in $Q$, the whole AMT has been completely
-constructed, and the root of AMT is returned.
-
-\subsection{Verification}
-\label{subsec:matching}
-
-As stated in the filter module, once a suspicious position in the text
-has been detected, the verification module checks that position for
-real pattern occurrences. Specifically, for such a suspicious position
-$i$, the engine searches a sequence of substrings of the text, where
-the first substring starts at $i$, in the corresponding nodes of AMT
-from the root. If any substring successfully matched a key that is
-marked as a pattern end in some node, a pattern is declared to be
-found at position $i$. However, if there is a mismatch or the
-searching goes beyond the leaves of AMT, the engine immediately
-forwards to the next position $i+1$ and invokes the filter again.
-
-The pseudocode of the verification procedure is shown in Algorithm
-\ref{alg:matching}. Suppose $i$ is a suspicious position of the text
-detected by the filter module. The variable $m\_len$ is the total
-length of the sub-strings of the text who have successfully matched
-with keys in AMT nodes. The variable $node$ points to the current
-matching node in the AMT. In addition, since all the keys in a node
-have the same length, the notation $key\_len(node)$ is used to denote
-the length of the keys in $node$.
-
-\begin{algorithm}
-  \caption{Verification}\scriptsize
-  \label{alg:matching}
-  \begin{algorithmic}[1]
-    \REQUIRE ~~\\
-    A suspicious position $i$ in the text $T$\\
-    The AMT built from the pattern set $P$\\
-    \ENSURE ~~\\
-    The patterns (if any) start at $i$
-    \STATE
-    \STATE $m\_len \leftarrow 0$
-    \STATE $node \leftarrow root$ of AMT
-    \STATE
-    \WHILE{$node \neq NULL$ and $\exists key \in node: key =
-      T[i+m\_len, \, key\_len(node)]$}
-    \STATE $m\_len \leftarrow m\_len + key\_len(node)$
-    \IF{$key$ is marked as a pattern end}
-    \STATE Report that the pattern $T[i,\,m\_len]$ is found at position $i$
-    \ENDIF
-    \STATE $node \leftarrow$ The child of $node$ corresponding to $node.key$
-    \ENDWHILE
-  \end{algorithmic}
-\end{algorithm}
-
-For the suspicious position $i$, the \textbf{while} loop from line 5
-to line 11 checks whether there are patterns starting at $i$. The
-checking starts form the root of AMT: if the corresponding sub-string
-$T[i+m\_len, \, key\_len(node)]$ matches some $key$ in the current
-$node$, the totally matched length $m\_len$ is increased by the length
-of the key. At the same time, if the matched $key$ is also marked as a
-pattern end, the verification module will report that a pattern,
-i.e. $T[i,\,m\_len]$, is found at position $i$. Then the checking
-transfers to the child of $node.key$ and makes that child node to be
-the current node. Once there is a mismatch or the current node goes
-beyond the leaves of AMT (i.e.  $node = NULL$), the checking
-terminates, and the engine forwards to the next position $i+1$.
-
-Note that, since the nodes in AMT have various types of inner
-structures, the search of the target string in a node, must use the
-search routine specified to the type of that node.
-
-\begin{figure}[htbp]
-  \centering
-  \includegraphics[width=0.75\textwidth]{./eps/match}
-  \caption{The verification procedure for the position $i$ in the
-    text.}
-  \label{fig:matching}
-\end{figure}
-
-Next, an example is given in figure \ref{fig:matching} to illuminate
-the verification for a suspicious position $i$ of a given text string
-$T$, using the AMT built in section \ref{subsec:amt}. The verification
-starts from the root of AMT: according to $key\_len(root)=2$, the same
-length sub-string starting at position $i$ of $T$, which is
-$T[i,\,2]=aa$, is taken to check whether it's one of the keys in
-root. The result is: $aa \in root$, and $aa$ is also marked as a
-pattern end. Therefore the pattern $T[i,\,2]=aa$ ($p_6$ in $P$) is
-found at position $i$. Then the checking transfers to $node_1$, which
-is the child node of $root.aa$.
-
-At $node_1$, since $key\_len(node_1)=6$, the same length sub-string
-$T[i+2,\,6]=e^6$, which follows $T[i,\,2]$, is trying to match with
-some key in $node_1$. The result is that: $e^6 \in node_1$ but it is
-not a pattern end. Then the checking simply transfers to $node_5$,
-which is the child of $node_1.e^6$.
-
-At $node_5$, since the next sub-string $T[i+8,\,5]=u^5 \in node_5$ and
-$u^5$ is marked as a pattern end, another pattern
-$T[i,\,13]=a^2e^6u^5$ ($p_4$ in $P$) is found at position $i$. Then
-the checking goes to the child of $node_5.u^5$, i.e.  $node_{10}$.
-
-At $node_{10}$, since $T[i+13,\,4]=sscc \notin node_{10}$, the
-verification for position $i$ terminates. And next, the engine will
-forward to position $i+1$ and invoke the filter module for that
-position.
-
-From above it can be seen that, each verification procedure actually
-corresponds to a \emph{verification path} in the AMT, whose tree nodes
-have been compared with the text in the former process. In particular,
-the verification path of the given example is:
-$root \rightarrow node_1 \rightarrow node_5 \rightarrow node_{10}$,
-witch is indicated by the dashed arrows in Figure \ref{fig:matching}.
-
-
-\subsection{Adaptive creation of the tree nodes}
-\label{subsec:nodes}
-
-As stated in section \ref{subsec:amt}, each node of AMT has a specific
-index structure to hold the prefixes of a prefix set as the keys. The
-type of the index structure is chosen adaptively according to the
-features of the prefix set. Since all the keys in the prefix set have
-the same length, the features of the prefix set can be mainly
-characterized by two values: the \emph{length} and \emph{number} of
-the keys in the prefix set. These two values have been respectively
-symbolized by $lss$ and $ndp$ in Section \ref{subsec:amt}.
-
-In this work, three different kinds of structures,
-i.e. \emph{character map}, \emph{string array} and \emph{hash table}
-can be adopted for prefix sets with different $lss$ and $ndp$
-combinations. Next, the detailed descriptions of these structures will
-be presented.
-
-\subsubsection{Character map}
-
-Given a prefix set, if the length of prefixes (keys) is equal to 1 ($lss=1$),
-i.e. each key in the prefix set is just a single character, the
-space-efficient \emph{character map} structure, which was proposed by
-Leis \cite{Leis2013}, will be adopted as the tree node. There are four
-sub-types of character maps with different capacities for different
-number of keys ($ndp$), where $1 \leq ndp \leq 256$.
-
-\begin{figure}[htbp]
-  \centering
-  \includegraphics[width=0.75\textwidth]{./eps/Maps}
-  \caption{The four sub-types of character maps. The triangles
-    represent the corresponding child nodes of the keys.}
-  \label{fig:character map}
-\end{figure}
-
-Figure \ref{fig:character map} illustrates the four sub-types of
-character maps which are named according to their maximum
-capacity. Instead of using one array of (\emph{key, child pointer})
-pairs, the key part and the child pointer part are stored in the
-separate arrays, which is able to keep the node structure compact
-while supporting efficient search.
-
-\begin{itemize}
-\item \textbf{Map 4} (for $1 \leq ndp \leq 4$): The smallest map type
-  can store up to 4 keys. It uses an array of 4 entries for keys and
-  another array of the same length for child pointers. The keys and
-  child pointers are stored at corresponding positions in their
-  arrays, and the keys are sorted according to their ACSII
-  values. Once the target character is found in the key array, its
-  child pointer can be located through the same position in the
-  pointer array. Figure \ref{fig:character map} (a) shows a Map 4
-  structure with three keys: $f$, $n$ and $p$, where the triangles
-  with the keys inside represent the corresponding child nodes.
-
-\item \textbf{Map 16} (for $5 \leq ndp \leq 16$): This map type is
-  used for storing 5 to 16 keys. It has the similar structure as Map
-  4, but both arrays have up to 16 entries. A target character can be
-  retrieved efficiently by a binary search in the key array. Figure
-  \ref{fig:character map} (b) shows a Map 16 structure with 14 keys.
-
-
-\item \textbf{Map 48} (for $17 \leq ndp \leq 48$): As the number of
-  keys increases, searching in the key array becomes
-  expensive. Therefore, maps with more than 16 (but less than 49) keys
-  do not store the keys explicitly. Instead, a 256-element \emph{index
-    array} is used, which can be directly indexed by the ASCII value
-  of the target character. This array stores only the array indexes
-  (small inters in the range of $[0,47]$) of another pointer array
-  that contains up to 48 child pointers. In this way, the storage
-  space can be saved comparing with storing pointers directly, because
-  each array index only requires one byte. Figure \ref{fig:character
-    map} (c) shows a Map 48 structure, where the ASCII values of $a$,
-  $b$ and $c$ are 97, 98 and 99 respectively.
-
-\item \textbf{Map 256} (for $49 \leq ndp \leq 256$): The largest map
-  type is simply an array of 256 child pointers with each pointer
-  initialized to $NULL$. It is used for storing 49 to 256 keys.  In
-  this kind of character map, the child node can be found directly
-  through the array index which is the ASCII value of the target
-  character. Different from other character maps, in Map 256, there is
-  only one array, and it is not necessary to carry out the additional
-  indirect access. Therefore, if most entries are not empty, this
-  representation is also very space efficient. Figure
-  \ref{fig:character map} (d) shows a Map 256 structure, where only
-  the pointer array is adopted.
-\end{itemize}
-
-The pseudocode of searching in a node, whose type is character map, is
-given in Algorithm \ref{alg:character map}.
-
-\begin{algorithm}
-  \caption{Searching in a node whose type is character map}\scriptsize
-  \label{alg:character map}
-  \begin{algorithmic}[1]
-    \REQUIRE ~~\\
-    A tree $node$ whose type is character map\\
-    The target character $t\_ch$.
-    \ENSURE ~~\\
-    The child node of $node.t\_ch$ (possibly $NULL$).
-    \STATE
-    \STATE $count \leftarrow$ Number of keys in the character map
-    \STATE
-    \SWITCH{The type of the character map}
-    \CASE{\textsf{Map 4}}
-    \FOR{$i \leftarrow 0$ to $count-1$}
-    \IF{$keys[i]=t\_ch$}
-    \RETURN $child\_pointers[i]$
-    \ENDIF
-    \ENDFOR
-    \STATE Report a mismatch.
-    \ENDCASE
-    \STATE
-    \CASE{\textsf{Map 16}}
-    \STATE $low \leftarrow 0, high \leftarrow count-1$
-    \WHILE{$low \le high$}
-    \STATE $mid \leftarrow \lfloor (low+high)/2 \rfloor$
-    \IF{$t\_ch=keys[mid]$}
-    \RETURN $child\_pointers[mid]$
-    \ELSIF{$t\_ch<keys[mid]$}
-    \STATE $high \leftarrow mid-1$
-    \ELSE
-    \STATE $low \leftarrow mid+1$
-    \ENDIF
-    \ENDWHILE
-    \STATE Report a mismatch.
-    \ENDCASE
-    \STATE
-    \CASE{\textsf{Map 48}}
-    \IF{$index[t\_ch] \neq NULL$}
-    \RETURN $child\_pointers[index[t\_ch]]$
-    \ELSE
-    \STATE Report a mismatch.
-    \ENDIF
-    \ENDCASE
-    \STATE
-    \CASE{\textsf{Map 256}}
-    \RETURN $child\_pointers[t\_ch]$
-    \ENDCASE
-    \ENDPWITCH
-  \end{algorithmic}
-\end{algorithm}
-
-\subsubsection{String array}
-\label{sec:string array}
-
-For the prefix set whose length of keys is greater than 1 ($lss > 1$)
-and the number of keys is not greater than 100 ($ndp \leq 100$), the
-\emph{string array} structure is adopted as a tree node. Similar to
-the Map 4 and Map 16 structures, the keys are stored in
-lexicographical order in a separate key array with $ndp \times lss$
-bytes, in which each key takes $lss$ bytes. The child pointers are
-stored at the corresponding positions in another pointer array. Figure
-\ref{fig:string array} illustrates a string array structure holding
-three keys: $aaa$, $bbb$ and $ccc$.
-
-\begin{figure}[htbp]
-  \centering
-  \includegraphics[width=0.45\textwidth]{./eps/string_array}
-  \caption{The string array structure with three keys: $aaa,\, bbb,\,
-    ccc$.}
-  \label{fig:string array}
-\end{figure}
-
-For efficiency, if the number of keys is less than 5, a naive linear
-search is used to search the target string in the key array;
-otherwise, a more efficient (but complicated) binary search algorithm
-is adopted.  The pseudocode of the searching in a node whose type is
-string array is depicted in Algorithm \ref{alg:string array}, where we
-use the notation $A \prec B$ to denote that string $A$ is
-\emph{lexicographically smaller} than string $B$. For the string array
-whose number of keys is less than 5, the target string is compared
-sequentially with the keys in the key array. If the target string
-matched some key, return the child pointer at the corresponding
-position in the pointer array; otherwise, report a mismatch. On the
-other hand, if the number of keys is greater than 4, the target string
-is searched by a binary search routine from the middle element of the
-key array.
-
-\begin{algorithm}
-  \caption{Searching in a node whose type is string array}\scriptsize
-  \label{alg:string array}
-  \begin{algorithmic}[1]
-    \REQUIRE ~~\\
-    A tree $node$ whose type is string array; \\
-    The target string $t\_str$.\\
-    \ENSURE ~~\\
-    The child node of $node.t\_str$ (possibly $NULL$).\\
-    \STATE
-    \STATE $count \leftarrow$ The number of keys in $node$
-    \STATE
-    \IF{$count < 5$}
-    \STATE $i \leftarrow 0$
-    \WHILE{$i < count$ and $keys[i] \prec t\_str$}
-    \STATE $i \leftarrow i+1$
-    \ENDWHILE
-    \IF{$i < count$ and $keys[i]=t\_str$}
-    \RETURN $child\_pointers[i]$
-    \ELSE
-    \STATE Report a mismatch
-    \ENDIF
-    \ELSE
-    \STATE $low \leftarrow 0$, $high \leftarrow count-1$
-    \WHILE{$low \leq high$}
-    \STATE $mid \leftarrow \lfloor (low+high)/2 \rfloor$
-    \IF{$t\_str = keys[mid]$}
-    \RETURN $child\_pointers[mid]$
-    \ELSIF{$t\_str < keys[mid]$}
-    \STATE $high \leftarrow mid - 1$
-    \ELSE
-    \STATE $low \leftarrow mid + 1$
-    \ENDIF
-    \ENDWHILE
-    \STATE Report a mismatch.
-    \ENDIF
-  \end{algorithmic}
-\end{algorithm}
-
-\subsubsection{Hash table}
-\label{sec:hash table}
-
-For the prefix set whose number of keys is greater than 100 ($lss > 1$
-and $ndp > 100$), searching in the string array structure becomes
-inefficient even using a binary search. In this case, a more fast (but
-heavy) data structure --- \emph{hash table} is adopted to deal with
-large number of keys. It is worth noting that, the construction of the
-hash table is directly based on the suffix set from which the prefix
-set is formed rather than the prefix set which is the basis of
-building other node structures. In our implementation, a hash table is
-an array of child pointers with each pointer initialized to $NULL$,
-and we also utilize a \emph{string hash function} which transforms a
-string to a positive integer.
-
-% Indeed, when computing $ndp$, we
-% merely count rather than really constructing the prefix set and then
-% computing its $ndp$
-
-In particular, given a suffix set $SF$, the size of the hash table
-(denoted by $table\_size$) is determined by $ndp$ and a given load
-factor $lf$ (ratio of $ndp$ to $table\_size$), i.e.
-$table\_size = \lceil ndp\,/\,lf \rceil$. For example, with the $ndp$
-of 1000 and a load factor of $70\%$, the $table\_size$ is
-$\lceil 1000/0.7 \rceil = 1429$. Note that, the $ndp$ here is defined
-to be the number of distinct length-$lss$ prefixes of the suffixes in
-$SF$, which is equal to the size of the prefix set derived from $SF$
-(after removing the repetitions).
-
-Algorithm \ref{alg:hash} shows the pseudocode of building a hash table
-based on $SF$. $SF$ is firstly partitioned into small suffix sets by
-hashing: for each suffix $suf \in SF$, its prefix $suf^{+lss}$ is
-hashed to an integer $i$ between 0 and $table\_size-1$ by the string
-hash function, then $suf$ is associated with the $i$-th slot of the
-hash table. After that, the suffixes whose length-$lss$ prefixes
-hashing to the same value are associated with the same slot of the
-hash table. Then, to address the hash collisions, for each slot that
-is not $NULL$, the associated suffixes form a small suffix set $SSF$,
-and a new tree node is created adaptively based on the prefix set
-derived from $SSF$, as we have shown in the \textbf{while} loop of
-Algorithm \ref{alg:amt}. The newly created tree node is then
-associated with the corresponding slot of the hash table. As a result,
-many tree nodes with various types can be associated within one hash
-table.
-
-% The suffixes whose length-$lss$ prefixes hashed to the same
-% value $i$ are collected together associated with the $i$-th slot and
-% forms a small suffix set. (Note that, we do not remove the prefixes of
-% the suffixes when partitioning $SF$.) Then, to address the collisions,
-% for each non-$NULL$ slot of the hash table, a tree node is built based
-% on the small suffix set associated with that slot as stated
-% before. Hence, many tree nodes with various structures can be
-% incorporated in one hash table.
-
-
-\begin{algorithm}
-  \caption{Building a hash table}\scriptsize
-  \label{alg:hash}
-  \begin{algorithmic}[1]
-    \REQUIRE ~~\\
-    The suffix set $SF$ and the load factor $lf$. \\
-    \ENSURE ~~\\
-    The hash table.\\
-    \STATE
-    \STATE $ndp \leftarrow$ The number of distinct length-$lss$
-    prefixes of suffixes in $SF$
-    \STATE $table\_size \leftarrow \lceil ndp\,/\,lf \rceil$
-    \STATE $hash\_table \leftarrow$ Create an array  of
-    $table\_size$ pointers with each pointer initialized to $NULL$
-    \STATE
-    \FOR{each $suf \in SF$}
-    \STATE $i \leftarrow Hash(suf^{+lss})$
-    \STATE Associate $suf$ with $hash\_table[i]$
-    \ENDFOR
-    \STATE
-    \FOR{$i \leftarrow 0$ to $table\_size - 1$}
-    \IF{$hash\_table[i]\, \neq\, NULL$}
-    \STATE $SSF \leftarrow \{suf\,|\,suf\in SF\; and\; Hash(suf^{+lss})=i\}$
-    \STATE $new\_node \leftarrow$ Adaptively create a tree node from
-    $SSF$, as shown in the \textbf{while} loop of Algorithm \ref{alg:amt}
-    \STATE Associate $new\_node$ with $hash\_table[i]$
-    \ENDIF
-    \ENDFOR
-    \STATE
-    \RETURN $hash\_table$
-  \end{algorithmic}
-\end{algorithm}
-
-Given a target string of length $lss$, the hash value of that string
-is computed and used as the index of the hash table. If the
-corresponding slot is $NULL$, which means there is a mismatch, the
-verification terminates and the engine moves to the next position;
-otherwise, the process goes to the tree node associated with that slot
-and compares the node with the corresponding substring in the text.
-
-The string hash function adopted can have a significant effect on the
-performance of verifying. In our implementation, for each matching
-task, the hash function is selected randomly from a \emph{hash
-  function family} $H$. The hash function family we adopted is the
-fast \emph{shift-add-xor} hash family proposed by Ramakrishna
-\cite{Ramakrishna1997}, which is claimed to be both uniform and
-universal.
-
-\subsection{Further Improvements}
-\label{sec:further improments}
-
-The verification module presented above is pretty efficient, but there
-are still some techniques that can further improve the time and space
-efficiency of this module.
-
-\subsubsection{Dividing the AMT}
-\label{sec:divide amt}
-
-The verification module we have just built is based on a big single
-AMT which is constructed from the whole pattern set. In fact, we can
-divide the big AMT into small ones and enable each verifying procedure
-to refer to only one small AMT, by which the time for verifying can be
-reduced. The division is based on the following observations.
-
-As stated in Section \ref{sec:filter}, the filtering is based on the
-last $k$-symbol block of the substring in the sliding window. In
-particular, for a position $i$ of the text $T$, if some pattern $p_j$
-starts at $i$, there must be
-$Hash[T[i+lss-k,k]] = Hash[p_j[lss-k+1,k]]$ (we call
-$Hash[p_j[lss-k+1,k]]$ the \emph{signature} of $p_j$). This means that
-we can group the patterns according to their signatures: patterns with
-the same signature are grouped and form a sub-pattern-set, and for
-each sub-pattern-set we build a (small) AMT. In addition, an index
-table is adopted to allow the corresponding AMT be retrieved in $O(1)$
-time by its signature. Now, the verification module consists of an
-index table as well as several small AMTs.
-
-In the filtering phase, once a suspicious position $i$ in $T$ is
-detected, the value $Hash[T[i+lss-k,k]]$ will be used as the index of
-the index table to find the corresponding small AMT for verifying. As
-the scale of the AMT shrunk, the time for each verifying is reduced
-accordingly.
-
-\subsubsection{Node Merging}
-\label{sec:node merge}
-
-Similar to the ``path compression'' technique that is widely used in
-many trie-like structures, the nodes in a path of AMT, each of which
-has only one key, can be merged into one node. This technique can
-improve both time and space efficiency of AMT. To illustrate its
-benefits, consider the pattern set
-$P=\{p_1=e^6u^5sscc,\; p_2=e^6u^5,\; p_3=e^6\}$ and the corresponding
-AMT constructed by Algorithm 1. As shown in Fig \ref{fig:merge}, the
-built AMT has three nodes, and each contains only one key. In a
-typical x86\_64 architecture, this implementation of AMT takes roughly
-55 bytes of memory: 15 bytes for the three keys, 16 bytes for the two
-child pointers and 24 bytes for the three pointers to the matching
-functions. However, if we combine the three keys into one string,
-these three nodes can be merged into one node, as a result, the child
-pointers are no longer needed and the number of function pointers is
-reduced from three to one. The merged node is another type of tree
-node in addition to the node types we have introduced in Section
-\ref{subsec:nodes}.
-
-\begin{figure}[htbp]
-  \centering
-  \includegraphics[width=0.6\textwidth]{./eps/node_merge}
-  \caption{Node merging.}
-  \label{fig:merge}
-\end{figure}
-
-For the merged node, the only problem is how to distinguish among the
-keys after they are concatenated. To address this issue, a
-\emph{length array} is used to store the length of each key, where
-each array element takes only one byte (using the \emph{unsigned char}
-type). Through the length of each key, we can delimit each original
-key from others, and thus, searching the target string in the merged
-node can be trivial.
-
-In general, after node merging, the AMT contains just one merged node
-which only takes 26 bytes (15 bytes for the keys, 3 bytes for the
-length array, and 8 bytes for the matching function pointer), thus, 29
-bytes are saved comparing with the original AMT. In addition, only one
-random access to the memory is needed to get the merged node (the
-original AMT needs three random memory accesses to get all its nodes),
-thus, the cache miss is reduced and the performance is improved.
-
-
-\subsubsection{Node splitting}
-\label{sec:node split}
-
-In order to further improve the searching efficiency of the tree
-nodes, once the keys in a node share a common prefix, that prefix
-should best be removed from the keys and form a new single key node
-. (Note that, since the prefix is either a character or a string, the
-type of the new created node is either Map 4 or String Array.)  This
-action can reduce a lot of redundant comparisons while searching a
-target key in a node. For instance -- as shown in Fig \ref{fig:split},
-consider searching a target key $a^5u$ in a node of String Array type,
-where the four keys of the node share a common prefix $a^5$. According
-to Algorithm \ref{alg:string array}, the target key have to be
-compared sequentially with the four keys, which will totally takes
-$6 \times 4 = 24$ byte comparisons to determine the inexistence of
-target key. However, if the common prefix $a^5$ is removed out of the
-keys and form another new node as shown in Fig \ref{fig:split}, for
-the same target key, only 9 byte comparisons are needed for verifying
-(5 comparisons for $node_1$ and another 4 comparisons for
-$node_2$). Obviously, comparing with only one node, the two nodes
-version can reduce 15 comparisons.
-
-\begin{figure}[htbp]
-  \centering
-  \includegraphics[width=0.4\textwidth]{./eps/node_split}
-  \caption{Node splitting.}
-  \label{fig:split}
-\end{figure}
-
-
-
-\section{Experimental Results}
-\label{sec:experiments}
-
-In this section, we evaluate the performance of the proposed fast
-engine for multi-pattern matching (\textsf{FEMPM} for short), and
-compare it with other four algorithms: the \textsf{AC} and \textsf{WM}
-algorithms, which are two classic ``baseline'' algorithms for MPM; the
-\textsf{MASM} and \textsf{Pre-filter+AC} algorithms, which are two
-state-of-the art MPM algorithms with good efficiency in practically
-matching. All these algorithms are evaluated in two aspects: the
-robustness of these algorithms under pattern sets with various $lsp$s
-and the scalability of the algorithms under pattern sets with various
-number of patterns.
-
-\subsection{Simulation Settings}
-
-
-The experiments are conducted on a PC with an Intel core i7 2.93GHz
-CPU, 8GB of RAM and 1TB Disk Driver; the operating system is Windows 7
-Professional (64-bits). All the testing algorithms are implemented in
-C/C++ within the IDE of \emph{Code::Blocks}. The test data used in the
-experiments is the real-world English text from the Pizza\;\&\;Chili
-corpus \cite{pizzachil}. The patterns are extracted randomly from the
-text to form the pattern sets.
-
-The parameter configuration in \textsf{FEMPM} in our experiment is
-given as follows. For the String Arrays, if the number of strings
-exceeds \textbf{4}, the binary search is used to search the target
-string in the key array; otherwise, the linear search is adopted. For
-the Hash Tables, the load factor is set to \textbf{0.5}; the
-\emph{seed} of the hash function is generated randomly in the range of
-$\mathbf{1} \sim \mathbf{50}$; the shift values \emph{L} and \emph{R}
-are set to \textbf{2} and \textbf{6} respectively. Once the $ndp$ is
-lager than \textbf{100}, the Hash Table is built instead of the String
-Array. These choices of parameters have been extensively tested on a
-wide range of pattern sets, and are considered to be very efficient
-for a typical match.
-
-\subsection{Robustness Evaluation}
-
-As we've mentioned before, many MPM algorithms are sensitive to the
-length of the shortest pattern ($lsp$) in the pattern set. So first,
-it is necessary to measure the robustness of \textsf{FEMPM} and other
-investigated algorithms under pattern sets with various $lsp$s. In
-this evaluation, there are totally 9 pattern sets for testing with
-$lsp$s ranging from 2 to 10, and each pattern set has a fixed number
-of $10^5$ patterns. The size of text string is fixed to 200 MB. The
-characteristics of the testing pattern sets are shown in Table
-\ref{tab:lsps}, which includes: the length of the shortest pattern
-(LSP), the length of the longest pattern (LLP), the average length of
-the patterns (ALP), the standard deviation of the pattern lengths
-(SD), the total length of the patterns (TLP) and the number of
-patterns in the pattern set (Count).
-
-\begin{table}
-  \centering
-  \caption{The characteristics of pattern sets with various LSPs.}
-  \scriptsize
-  \label{tab:lsps}
-  \begin{tabular}{rrrrrrr}
-    \hline
-    Pattern Set & LSP  & LLP  & ALP & SD & TLP & Count\\
-    \hline
-    $P_1$ & 2 & 50 & 25.9 & 14.1 & 2,599,020 & $10^5$\\
-    $P_2$ & 3 & 50 & 26.5 & 13.9 & 2,646,762 & $10^5$\\
-    $P_3$ & 4 & 50 & 27.0 & 13.6 & 2,704,091 & $10^5$\\
-    $P_4$ & 5 & 50 & 27.6 & 13.2 & 2,745,545 & $10^5$\\
-    $P_5$ & 6 & 50 & 27.9 & 13.0 & 2,793,178 & $10^5$\\
-    $P_6$ & 7 & 50 & 28.4 & 12.7 & 2,843,580 & $10^5$\\
-    $P_7$ & 8 & 50 & 29.0 & 12.4 & 2,903,343 & $10^5$\\
-    $P_8$ & 9 & 50 & 29.5 & 12.1 & 2,948,372 & $10^5$\\
-    $P_9$ &10 & 50 & 30.0 & 11.8 & 2,998,992 & $10^5$\\
-    \hline
-  \end{tabular}
-\end{table}
-
-\begin{figure}[htbp]
-  \centering
-  \includegraphics[width=0.6\textwidth]{./eps/lsp}
-  \caption{Matching times for various lsps.}
-  \label{fig:lsp}
-\end{figure}
-
-Figure \ref{fig:lsp} presents the mean matching time (in seconds) used
-by these algorithms based on 5 independent runs. In general, the
-\textsf{AC} algorithm is not affected much by the changes in
-$lsp$. However, the DFA built by this algorithm consumes a huge amount
-of memory. What's worse is that, the frequent and unpredictable
-state/failure transitions will lead to a lot of cache misses during
-matching, and these result in the low performance of \textsf{AC}. On
-the other side, it can be seen from Figure \ref{fig:lsp} that the
-\textsf{WM} algorithm is affected much by the changes in $lsp$: it
-outperforms \textsf{AC} on the pattern sets whose $lsp$ is larger than
-2, but for the pattern sets with small $lsp$, the performance of
-\textsf{WM} degrades dramatically. This is due to the ``skip
-strategy'' of \textsf{WM} algorithm that does not work well for the
-pattern sets with small $lsp$s, which means most of the positions in
-the text need to be checked by the HASH table of \textsf{WM}, and this
-takes a lot of time. The \textsf{Pre-filter+AC} algorithm outperforms
-all other algorithms except for \textsf{FEMPM} for pattern sets whose
-$lsp$ is larger than 4. Similarly, this algorithm also uses a skip
-strategy: once a position of the text is filtered out by the
-Pre-filter, at most the following $lsp-1$ positions can be skipped
-over. Consequently, for pattern sets with small $lsp$, this algorithm
-can not skip much in the text, which will seriously affect its
-performance. In contrast, the \textsf{MASM} algorithm performs well
-for small $lsp$ ($lsp \leq 4$). This algorithm first compacts the
-pattern set by a prefix tree: if a pattern $A$ is a prefix of another
-pattern $B$, $A$ can be merged into $B$. Then the algorithm builds a
-binary search tree for the compacted pattern set based on
-lexicographical order. Comparing with the long patterns, the short
-ones are more likely to be prefixes of others, and thus, more likely
-to be eliminated by compacting. Thus, pattern sets with small $lsp$
-are well compressed, which will improve both time and space efficiency
-of \textsf{MASM} in the matching phase.
-
-From Figure \ref{fig:lsp} we can also see that, \textsf{FEMPM}
-outperforms all other investigated algorithms on every
-$lsp$. Comparing with \textsf{AC}, the matching time is reduced by
-$85\%$ in average for all $lsp$s; even comparing with the fast
-\textsf{Pre-filter+AC} algorithm, the matching time is reduced by
-$10\% \sim 20\%$ for medium $lsp$s ($lsp \geq 4$) and by $70\%$ for
-small $lsp$s ($lsp < 4$). Although the filter part of \textsf{FEMPM},
-which likes that of \textsf{Pre-filter+AC}, is not suitable for small
-$lsp$, the verification part, i.e. AMT, is more efficient than that of
-the \textsf{Pre-filter+AC}. This is mainly due to the adaptivity of
-the nodes of AMT, which enables the tree nodes as efficient and
-compact as possible. Therefore, no matter what the $lsp$s of the
-pattern sets are, the corresponding AMT is able to keep high search
-efficiency as well as low memory requirement in the verification
-phase. Owing to this, the \textsf{FEMPM} has the best robustness for
-all of the testing pattern sets. The statistical data about node types
-of corresponding AMTs are shown in table \ref{tab:node types}. The
-Single Char and Single String types in the table are actually the Map
-4 and String Array types which contain only one element,
-respectively. Obviously, as the $lsp$ of the pattern set changes, the
-number of nodes of the each type in the AMT changes accordingly, which
-reflects the adaptivity of AMT.
-
-Moreover, the performance of \textsf{FEMPM} is very stable and
-reliable. In particular, once the length of the text and number of
-patterns are fixed, the matching time changes little for various
-$lsp$s. As shown in Figure \ref{fig:lsp}, the matching time of
-\textsf{FEMPM} keeps almost 10 seconds unchanged for a text of about
-200MB and a pattern set with about $10^5$ patterns; for $lsp$s ranging
-from $2$ to $10$, the change in the matching time is less than 2
-seconds. In fact, as the $lsp$ increases, the average length of the
-paths from the root to the leaves in AMT will increase
-slightly. Accordingly, in the matching phase, the matching paths for
-some text positions may get a little bit longer, which might slightly
-affect the matching speed.
-
-\begin{table}[!htp]
-  \centering
-  \caption{The statistics about the AMTs under various lsps}
-  \scriptsize
-  \label{tab:node types}
-  \begin{tabular}{rrrrrrrrrr}
- \hline
- Lsp &
- Single Char &
- Map 4 &
- Map 16 &
- Map 48 &
- Map 256 &
- Single String &
- String Array   &
- Hash Table &
- Total\\
- \hline
- 2  & 2,464 & 2,096 & 663 & 133 & 0 & 63,274 &  21,627 & 10 & 90,267\\
- 3  & 2,379 & 1,636 & 385 & 90  & 0 & 64,701 &  22,551 & 10 & 91,752\\
- 4  & 2,273 & 1,329 & 201 & 57  & 0 & 66,162 &  22,736 &  1 & 92,759\\
- 5  & 2,045 & 1,104 & 112 & 45  & 0 & 68,152 &  22,048 &  1 & 93,507\\
- 6  & 1,758 &   899 &  52 & 34  & 0 & 70,179 &  20,818 &  1 & 93,741\\
- 7  & 1,560 &   807 &  29 & 33  & 0 & 72,284 &  19,280 &  1 & 93,994\\
- 8  & 1,515 &   803 &  20 & 31  & 0 & 73,447 &  18,274 &  1 & 94,091\\
- 9  & 1,441 &   788 &  24 & 30  & 0 & 74,584 &  17,120 &  1 & 93,988\\
-10  & 1,361 &   794 &  24 & 29  & 0 & 75,094 &  16,427 &  1 & 93,730\\
-\hline
-  \end{tabular}
-\end{table}
-
-\subsection{Scalability Evaluation}
-
-In this section, we evaluate the scalability of the investigated
-algorithms by testing them under pattern sets with various numbers of
-patterns. As before, the size of the text is fixed to 200MB, and there
-are two groups of pattern sets for testing --- the small group and the
-large group. The small group contains 9 pattern sets, with the sizes
-(number of patterns) increasing from $1 \times 10^5$ to
-$9 \times 10^5$ with step size of $10^5$, while the large group
-contains 10 pattern sets, with the sizes increasing from $10^6$ to
-$10^7$ with step size of $10^6$. The range of the pattern length of
-each pattern set is fixed to $5 \sim 50$.
-
-\begin{figure}[htbp]
-  \centering
-  \includegraphics[width=0.6\textwidth]{./eps/small_group}
-  \caption{Matching times for the small group.}
-  \label{fig:small_group}
-\end{figure}
-
-For the small group, the mean matching times of the investigated
-algorithms under 5 independent runs are shown in Figure
-\ref{fig:small_group}. The experimental results indicate that, the
-performance of the \textsf{AC} algorithm is not good but relative
-stable with the number of patterns growing. Also it can not deal with
-pattern sets whose size is larger than $7 \times 10^5$ in this testing
-, due to out of memory. Although the \textsf{WM} algorithm performs
-better than \textsf{AC}, its performance is not stable. For instance,
-the matching time only rises about $1s$ as the number of patterns
-increases from $2 \times 10^5$ to $3 \times 10^5$, but when the number
-of patterns increases from $8 \times 10^5$ to $9 \times 10^5$, the
-matching time rises up to $9s$. Thus, we can not estimate the matching
-time of \textsf{WM} based on the size of the pattern set. The
-\textsf{Pre-filter+AC} performs well as the number of patterns grows,
-but its matching time is also unpredictable, e.g. the matching times
-are nearly the same as the number of patterns increases from
-$4 \times 10^5$ to $5 \times 10^5$. The reason is that: the effect of
-the filters used by these two algorithms highly depends on the
-contents of the text and patterns themselves. For some pattern sets
-whose patterns occurs frequently in the text, the effect of the
-filters degrades. On the other hand, as the number of patterns grows,
-the matching time of \textsf{MASM} grows more slowly than that of the
-\textsf{Pre-filter+AC}, which is due to that the matching time of
-\textsf{MASM} mainly relies on the depth of the pipelinded binary
-search tree and that depth grows very slow as the number of patterns
-increases.
-
-\begin{table}[!htp]
-  \scriptsize
-  \caption{The statistics about the AMTs for the small group}
-  \label{tab:small}
-  \begin{tabular}{rrrrrrrrrr}
- \hline
- Size &
- Single Char &
- Map 4 &
- Map 16 &
- Map 48 &
- Map 256 &
- Single String &
- String Array   &
- Hash Table &
- Total\\
-\hline
-$1 \times 10^5$  &  2,000 &  1,006 &    72 &  18 & 0 &  68,268 &  21,971 & 103 &  93,438 \\
-$2 \times 10^5$ &  4,628 &  2,808 &   307 &  42 & 0 & 130,440 &  46,514 & 244 & 184,983 \\
-$3 \times 10^5$ &  7,414 &  4,858 &   574 &  84 & 0 & 190,653 &  71,757 & 403 & 275,746 \\
-$4 \times 10^5$ & 10,555 &  7,282 &   946 & 139 & 0 & 247,656 &  97,967 & 544 & 365,089 \\
-$5 \times 10^5$ & 13,703 & 10,651 & 1,503 & 238 & 4 & 302,350 & 124,528 &  17 & 452,994 \\
-$6 \times 10^5$ & 17,335 & 13,536 & 1,954 & 298 & 0 & 356,644 & 151,435 &  31 & 531,233 \\
-$7 \times 10^5$ & 21,080 & 16,872 & 2,405 & 388 & 4 & 408,165 & 179,621 &  35 & 628,570 \\
-$8 \times 10^5$ & 24,357 & 20,094 & 2,977 & 436 & 3 & 457,674 & 208,426 &  37 & 714,004 \\
-$9 \times 10^5$ & 28,356 & 23,924 & 3,441 & 513 & 9 & 504,779 & 238,632 &  42 & 799,696 \\
-\hline
-  \end{tabular}
-\end{table}
-
-Among all these algorithms, the \textsf{FEMPM} is the most efficient
-as well as stable one. The high performance of \textsf{FEMPM} is
-mainly due to the \emph{root} node of AMT, which is almost always the
-Hash Table as the number of patterns grows. As mentioned before, the
-root plays the role of another ``filter'', by which a large number of
-positions of the text that can not be filtered by the filter part may
-have a chance to be filtered out by the root. Moreover, the increasing
-in the number of patterns mainly leads to the growing of the width
-rather than the depth of AMT. Therefore, for each position of the
-text, the checking time changes slightly. From the experimental
-results, we can even give a rough estimate on the matching time based
-on the size of pattern set as follows: given the text of 200 MB, an
-increase of $10^5$ in the number of patterns will lead to roughly $1$
-more second taken in the matching time. The statistics about the node
-types of the corresponding AMTs for the small group are shown in Table
-\ref{tab:small}. We can see that an increase of $10^5$ in the number
-of patterns will yield about $9 \times 10^4$ tree nodes.
-
-\begin{figure}[htbp]
-  \centering
-  \includegraphics[width=0.6\textwidth]{./eps/large_group}
-  \caption{Matching times for the large group.}
-  \label{fig:large_group}
-\end{figure}
-
-For the large group, the mean matching times of the investigated
-algorithms are shown in Figure \ref{fig:large_group}. It can be seen
-that, as the number of patterns grows from $10^6$ to $10^7$, the
-increases in the matching time of the investigated algorithms are:
-$410\%$ (\textsf{WM}), $374\%$ (\textsf{Pre-filter+AC}), $238\%$
-(\textsf{MASM}), $112\%$ (\textsf{FEMPM}) respectively. For every
-increase of $10^6$ in the number of patterns, the mean increment in
-the matching time of the investigated algorithms are: $23.7s$
-(\textsf{WM}), $17.0s$ (\textsf{Pre-filter+AC}), $12.3s$
-(\textsf{MASM}), $3.5s$ (\textsf{FEMPM}) respectively. This indicates
-that, \textsf{Pre-filter+AC} and \textsf{WM} perform not well for
-large pattern sets. This is because, as the number of patterns grows,
-the chances for every position of the text to successfully match a
-pattern increases, which will reduce the effect of the filters of
-these algorithms and results in performance degradation. The
-\textsf{MASM} algorithm outperforms \textsf{Pre-filter+AC} for pattern
-sets whose size are larger than $3 \times 10^6$, which is due to its
-pattern set compression strategy and the good scalability of its
-pipelinded binary search tree.
-
-\begin{table}[!htp]
-  \caption{The statistics about the AMTs for the large group}
-  \scriptsize
-  \label{tab:large_group}
-  \begin{tabular}{rrrrrrrrrr}
- \hline
- Size &
- Single Char &
- Map 4 &
- Map 16 &
- Map 48 &
- Map 256 &
- Single String &
- String Array   &
- Hash Table &
- Total\\
-\hline
-$1 \times 10^6$ &  38,935 &   27,428  &   6,468 &     851   &    4 &    588,343  &    240,886 &  1,027 &    903,942  \\
-$2 \times 10^6$ &  85,900 &   68,973  &  17,084 &   2,141   &   20 &  1,091,527  &    496,001 &  2,015 &  1,763,661  \\
-$3 \times 10^6$ & 136,054 &  117,527  &  28,092 &   3,410   &   17 &  1,547,659  &    764,359 &  2,749 &  2,599,867  \\
-$4 \times 10^6$ & 189,926 &  171,155  &  40,328 &   4,716   &   23 &  1,966,326  &  1,045,558 &  3,450 &  3,421,482  \\
-$5 \times 10^6$ & 247,707 &  230,163  &  83,043 &   5,989   &  38 &  2,354,308   &  1,332,896 &  3,885 &  4,228,029  \\
-$6 \times 10^6$ & 304,863 &  293,591  &  65,475 &   7,169   &   49 &  2,706,094  &  1,625,261 &  4,379 &  5,006,881  \\
-$7 \times 10^6$ & 366,861 &  361,695  &  77,899 &   8,434   &   53 &  3,030,673  &  1,925,027 &  4,733 &  5,775,380  \\
-$8 \times 10^6$ & 429,121 &  433,708  &  90,280 &   9,660   &   62 &  3,336,765  &  2,226,879 &  5,070 &  6,531,545  \\
-$9 \times 10^6$ & 494,278 &  509,992  & 102,402 &  10,833   &   72 &  3,623,407  &  2,537,413 &  5,224 &  7,283,621  \\
-$1 \times 10^7$ & 558,241 &  591,455  & 115,012 &  11,922   &   79 &  3,986,683  &  2,847,277 &  5,505 &  8,026,174  \\
-\hline
-\end{tabular}
-\end{table}
-
-On the other hand, among all the algorithms, \textsf{FEMPM} is the
-most efficient algorithm for large pattern sets. An increase of $10^6$
-in the number of patterns, only requires 3 more seconds to match, this
-is mainly due to the good scalability of the AMT which enables the
-matching time grows very slow as the number of patterns explodes. The
-statistical data about the AMTs for the large group are shown in Table
-\ref{tab:large_group}. Every $10^6$ increase in the number of patterns
-will increase only about $8 \times 10^5$ tree nodes.
 
 \section{Conclusion and Future Works}
 \label{sec:conclusion}
@@ -1452,6 +367,50 @@ quence Problem,” J. ACM, vol. 24, pp. 664-675, 1977
   Subsequence Problem,” Technical Report No. 85123-CS, Computer
   Science Dept., Univ. of Bonn, Oct. 1994.
   
+\bibitem{Hunt1977} J. W. Hunt and T. G. Szymanski. A fast algorithm
+  for computing longest common subsequences.  Communications of the
+  ACM, 20(5):350–353, 1977.
+
+\bibitem{Korkin2001} D. Korkin. A new dominant point-based parallel
+  algorithm for multiple longest common subsequence problem. Technical
+  report, TR01-148, Univ. of New Brunswick, 2001
+
+\bibitem{Chen2006} Y. Chen, A. Wan, and W. Liu. A fast parallel
+algorithm for finding the longest common sequence of
+multiple biosequences. BMC Bioinformatics, 7(Suppl
+4):S4, 2006.
+
+\bibitem{Wang2011} Q. Wang, D. Korkin, and Y. Shang. A fast multiple
+longest common subsequence (MLCS) algorithm.  Knowledge and Data
+Engineering, IEEE Transactions on, 23(3):321–334, 2011.
+
+\bibitem{Li2012} Y. Li, Y. Wang, and L. Bao. Facc: a novel finite
+  automaton based on cloud computing for the multiple longest common
+  subsequences search. Mathematical Problems in Engineering, 2012,
+  2012.
+
+\bibitem{Yang2013} J. Yang, Y. Xu, and Y. Shang. A new progressive
+  algorithm for a multiple longest common subsequences problem and its
+  efficient parallelization. Parallel and Distributed Systems, IEEE
+  Transactions on, 24(5):862–870, 2013.
+
+\bibitem{Yang2014} J. Yang, Y. Xu, and Y. Shang. A space-bounded
+  anytime algorithm for the multiple longest common subsequence
+  problem. Knowledge and Data Engineering, Transactions on,
+  26(11):2599–2609, 2014.
+
+\bibitem{LiICDE} Yanni Li, Yuping Wang, Zhensong Zhang, etc. A Novel
+  Fast and Memory Efficient Parallel MLCS Algorithm for Long and
+  Large-Scale Sequences Alignments.  IEEE International Conference on
+  Data Engineering (ICDE). pp.1170-1181. 2016.
+
+\bibitem{LiSIGKDD} Li, Yanni and Li, Hui and Duan, Tihua, etc. A Real Linear
+and Parallel Multiple Longest Common Subsequences (MLCS)
+Algorithm. Proceedings of the 22nd ACM SIGKDD International Conference
+on Knowledge Discovery and Data
+Mining. pp.1170-1181. pp.1725-1734. 2016.
+
+
 
 
 \bibitem{pizzachil} {\it http://pizzachil.dcc.uchile.cl/}
