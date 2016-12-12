@@ -45,21 +45,22 @@
 \begin{abstract}
 
   Searching for the Multiple Longest Common Subsequences (MLCS) of
-  multiple sequences is a classical NP-hard problem that is widely
+  multiple sequences is a classical NP-hard problem which is widely
   used in many areas such as bioinformatics and biomedicine,
   etc. Although significant efforts have been made to address this
-  problem, the increasing amount of biological data require more
+  problem, the increasing amount of biological data requires more
   efficient methods. In this paper, we present a novel fast algorithm
-  for the MLCS problem, which is based on the dominant point approach
-  and employs a new technique called path marking. During the
-  construction of the dominant point graph, the path marking technique
-  can real-timely mark the longest path from the source node to the
-  current node, and once the graph has been constructed the longest
-  paths corresponding to every MLCS can be found immediately. The
-  experimental results demonstrate that, comparing with the ``Minima''
-  operation that is widely used in the existing algorithms, the path
-  marking is much more efficient, and therefore our algorithm is
-  faster than those algorithms.
+  --- PM-MLCS for the MLCS problem, which is based on the dominant
+  point approach and employs a new technique called path
+  marking. During the construction of the dominant point graph, the
+  path marking technique can real-timely mark the longest path from
+  the source node to the current node, and once the graph has been
+  constructed the longest paths corresponding to every MLCS can be
+  found immediately. The experimental results demonstrate that,
+  comparing with the expensive ``Minima'' operation that is widely
+  used in the existing algorithms, the path marking is much more
+  efficient, and therefore our algorithm is faster than those
+  algorithms.
 
 \end{abstract}
 
@@ -127,55 +128,59 @@ of the new algorithms with existing ones are presented. In Section
 \label{sec:related works}
 
 In this section, we define some notations and terminology used in this
-paper and reviews some related works in the MLCS problem.
+paper and review some related works in the MLCS problem.
 
-Let $\Sigma$ represent a finite alphabet for the sequences.  For
-example, for the DNA sequences, $\Sigma=\{A, C, T, G\}$.
+First of all, let $\Sigma$ represent a finite alphabet for the
+sequences.  For example, for the DNA sequences,
+$\Sigma=\{A, C, T, G\}$.
 
-\textbf{Definition 1.} Let $s=c_1c_2...c_n$ be a sequence with length
-$n$ over $\Sigma$. A \emph{subsequence} of $s$ is the one that can be
+\textbf{Definition 1.} Let $s=c_1c_2...c_n$ be a sequence of length
+$n$ over $\Sigma$, where the $i$-th character of $s$ is denoted by
+$s[i]=c_i$. A \emph{subsequence} of $s$ is a sequence that can be
 obtained by deleting zero or more (not necessarily consecutive)
 characters from $s$. Formally, $s'=c_{i_1}c_{i_2}...c_{i_k}$ is called
 a subsequence of $s$, if for $1 \leq j \leq k$, there is
 $1 \leq i_j \leq n$, and for all $r$ and $t$, $1 \leq r < t \leq k$,
 there is $i_r < i_t$.\\
 
-\textbf{Definition 2.} Let $S=\{s_1, s_2, ..., s_d\}$ be a set of $d$
-sequences over $\Sigma$. A Longest Common Subsequence (\emph{LCS}) of
-$S$ is a sequence $lcs$ such that: (1) $lcs$ is a subsequence of all
-$s_i$ ($1 \leq i \leq d$); (2) there is no sequence satisfying (1) and
-longer than $lcs$.\\
+\textbf{Definition 2.} Given $d$ sequences: $s_1, s_2, ..., s_d$ over
+$\Sigma$. A Longest Common Subsequence (\emph{LCS}) of the $d$
+sequences is a sequence $lcs$ such that: (1) $lcs$ is a subsequence of
+all $s_i$ ($1 \leq i \leq d$) (2) there is no sequence satisfying (1)
+and longer than $lcs$.\\
 
 In general, given $d$ sequences, there usually exists more than one
-LCS of the $d$ sequences. For example, given three sequences $s_1 =
-ACTAGTGC$, $s_2 = TGCTAGCA$ and $s_3 = CATGCGAT$, there are two LCSs
-with length 4, which are $lcs_1 = CAGC$, $lcs_2 = CTGC$,
-respectively. The MLCS problem is to find all LCSs of three or more
-sequences. For two sequences, the problem is commonly called the LCS
-problem. Obviously, the LCS is a special case of the MLCS. Specific
-algorithms developed for LCS are generally inefficient for MLCS.\\
+LCS. For example, given three DNA sequences $s_1 = ACTAGTGC$,
+$s_2 = TGCTAGCA$ and $s_3 = CATGCGAT$, there are two LCSs of length 4,
+which are $lcs_1 = CAGC$ and $lcs_2 = CTGC$, respectively. The MLCS
+problem is to find all LCSs of three or more sequences. For the
+special case of two sequences, the problem is usually called the LCS
+problem. Particularly, specific algorithms developed for LCS problem
+are generally inefficient for
+MLCS problem.\\
 
-
-Because of the importance of the MLCS problem, several efficient
-algorithms have been proposed in the past decades.
+Because of the importance of MLCS problem, several efficient
+algorithms have been proposed in the past decades. Roughly, there are
+two classes of the MLCS algorithms: the dynamic programming based
+approaches and the dominant point based approaches.
 
 \subsection{Dynamic Programming Based Approaches}
 \label{sec:Dynamic Programming}
 
-The classical exact algorithms for MLCS problem are based on dynamic
+The classical approaches for the MLCS problem are based on dynamic
 programming \cite{Smith1981}, \cite{Sankoff1972}. Given $d$ sequences:
-$s_1,\, s_2,\,...,\, s_d$ with length $n_1,\, n_2,\, ...,\, n_d$
-respectively, these approaches recursively construct a
-$n_1 \times n_2 \times ... \times n_d$ dimension score table $T$, in
-which $T[i_1,\, i_2,\, ...,\, i_d]$ contains the length of the LCSs of
-the prefixes $s_1[1...i_1]$, $s_2[1...i_2]$, ..., $s_d[1...i_d]$.
+$s_1,\, s_2,\,...,\, s_d$ of length $n_1,\, n_2,\, ...,\, n_d$
+respectively, these approaches recursively construct a score table $T$
+with $n_1 \times n_2 \times ... \times n_d$ cells, in which
+$T[i_1,\, i_2,\, ...,\, i_d]$ records the length of the LCSs of the
+prefixes $s_1[1...i_1]$, $s_2[1...i_2]$, ..., $s_d[1...i_d]$, and
 $T[i_1,\, i_2,\, ...,\, i_d]$ can be computed recursively by the
 following formula:
 
 \begin{equation*}
   T[i_1,\, i_2,\, ...,\, i_d] = 
   \begin{cases}
-    0 & \text{if $\exists j, 1 \leq j \leq d, i_j = 0$}\\
+    0 & \text{if $\exists j(1 \leq j \leq d), i_j = 0$}\\
     T[i_1-1,\, ...,\, i_d-1] + 1  & \text{if $s_1[i_1] = s_2[i_2] =
       ... = s_d[i_d]$}\\
     max(\bar{T}) & \text{otherwise}
@@ -184,135 +189,168 @@ following formula:
 
 where $\bar{T} = \{T[i_1-1,\, i_2,\, ...,\, i_d],\, T[i_1,\, i_2-1,\,
 ...,\, i_d],\, ...,\, T[i_1,\, i_2,\, ...,\, i_d-1]\}$. Once the score
-table $T$ is constructed, all the MLCS can be collected by tracing
-back from the last cell $T[n_1,\, n_2,\, ...,\, n_d]$ to the first
-cell $T[0,\, 0,\, ...,\, 0]$. Fig. \ref{fig:DM} shows an example of
-score table $T$ for two sequences $s_1 = GATTACA$ and $s_2 =
-GTAATCTAAC$.  Obviously, the time and space complexity of dynamic
-programming based approaches for a MLCS problem with $d$ sequences of
-length $n$ are both $O(n^d)$ \cite{Hsu1984}, therefore, they can not
-be applied to MLCS problems with more than two sequences in
-practice. To reduce the complexity of dynamic programming based
-approaches, various approaches have been proposed
-\cite{Hirschberg1977}, \cite{Apostolico1992}, \cite{Masek1980},
-\cite{Rick1994}. Unfortunately, these approaches primarily address the
+table $T$ is constructed, the MLCS can be collected by tracing back
+from the last cell $T[n_1,\, n_2,\, ...,\, n_d]$ to the first cell
+$T[0,\, 0,\, ...,\, 0]$. Fig. \ref{fig:DM} (a) shows an example of the
+score table $T$ for two sequences $s_1 = ACTAGCTA$ and $s_2 =
+TCAGGTAT$. Their MLCS are $TAGTA$ and $CAGTA$ which can be found by
+tracing back from $T[8,\, 8]$ to $T[0,\, 0]$, as shown in Fig. [] (b).
+
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.9\textwidth]{./eps/DM}
+  \caption{The score table of two DNA sequences ACTAGCTA and TCAGGTAT.}
+  \label{fig:DM}
+\end{figure}
+
+Obviously, the time and space complexity of dynamic programming based
+approaches for a MLCS problem with $d$ sequences of length $n$ are
+both $O(n^d)$ \cite{Hsu1984}, therefore, those approaches can not be
+applied to MLCS problems with more than two sequences in practice. To
+reduce the complexity of dynamic programming based approaches, various
+methods have been proposed \cite{Hirschberg1977},
+\cite{Apostolico1992}, \cite{Masek1980},
+\cite{Rick1994}. Unfortunately, these methods primarily address the
 LCS problem of two sequences.
 
 \subsection{Dominant Point Based Approaches}
 \label{sec:Dominant Point}
 
-In order to illustrate the dominant point based approaches, we
-introduce some terminologies first:
+Many works have been proposed to improve dynamic programming based
+approaches in order to process large size data, among which the
+dominant point approaches are the most efficient. Before introducing
+the dominant point based approaches, some terminologies are introduced
+first:
 
-\textbf{Definition 3.} Let $S = \{s_1,\, s_2,\, ...,\, s_d\}$ be a set
-of $d$ sequences over $\Sigma$, and $s_i[j]$ be the $j$-th character
-of $s_i$. A point $p = (p_1,\, p_2,\, ...,\, p_d)$ is called a
-\emph{match point} of $S$, if $s_1[p_1] = s_2[p_2] = ... = s_d[p_d] =
-\delta$, where $\delta$ is the symbol corresponding to the matched
-point $p$. The character corresponding to the match point $p$ is
-denoted as $C(p)$.\\
+\textbf{Definition 3.} Given $d$ sequences: $s_1,\, s_2,\, ...,\, s_d$
+over $\Sigma$. A point $p = (p_1,\, p_2,\, ...,\, p_d)$ is called a
+\emph{match point} of the sequences, if $s_1[p_1] = s_2[p_2] = ... =
+s_d[p_d] = \delta$, where $\delta$ is the character corresponding to
+the matched point $p$ and denoted by $C(p)$.\\
 
 \textbf{Definition 4.} Given two match points $p = (p_1,\, p_2,\,
-...,\, p_d)$ and $q = (q_1,\, q_2,\, ...,\, q_d)$ of $S$, we say that
-$p = q$, if and only if $p_i = q_i$ ($1 \leq i \leq d$). If $p_i \leq
-q_i$ ($1 \leq i \leq d$), we say $p$ \emph{dominates} $q$, denoted as
-$p \preceq q$. Further, if $p_i < q_i$ ($1 \leq i \leq d$), we say $p$
-\emph{strongly dominates} $q$, denoted as $p \prec q$.  If $p \prec q$
-and there is no match point $r$ such that $p \prec r \prec q$ and
-$C(q) = C(r)$, we call $q$ a \emph{successor} of $p$, or $p$ a
-\emph{precursor} of $q$. Obviously, one match point has at most
+...,\, p_d)$ and $q = (q_1,\, q_2,\, ...,\, q_d)$ of $d$ sequences, we
+say that $p = q$, if and only if $p_i = q_i$ ($1 \leq i \leq d$). If
+$p_i \leq q_i$ ($1 \leq i \leq d$), we say $p$ \emph{dominates} $q$,
+denoted by $p \preceq q$. Further, if $p_i < q_i$ ($1 \leq i \leq d$),
+we say $p$ \emph{strongly dominates} $q$, denoted by $p \prec q$.  If
+$p \prec q$ and there is no match point $r$ such that $p \prec r \prec
+q$ and $C(q) = C(r)$, we call $q$ a \emph{successor} of $p$, or $p$ a
+\emph{precursor} of $q$. In particular, one match point has at most
 $|\Sigma|$ successors with each character in $\Sigma$ corresponds to
 one successor. \\
 
 \textbf{Definition 5.} The \emph{level} of a match point $p = (p_1,\,
 p_2,\, ...,\, p_d)$ is defined to be $L(p) = T[p_1,\, p_2,\, ...,\,
-p_d]$, where $T$ is the score table constructed in the dynamic
-programming methods. A match point $p$ is called a \emph{k-dominant
-point} (\emph{k-dominants} for short) if and only if: (1) $L(p) = k$;
-(2) there is no other match point $q$ such that: $L(q) = k$ and $q
-\preceq q$. All the $k$-dominants forms a set denoted as $D^k$.
+p_d]$, where $T$ is the score table constructed by formula []. A match
+point $p$ is called a \emph{k-dominant point} (\emph{k-dominants} for
+short) if and only if: (1) $L(p) = k$ (2) there is no other match
+point $q$ such that: $L(q) = k$ and $q \preceq q$. All the
+$k$-dominants form a set denoted by $D^k$.
 
 The motivation of the dominant point based approaches is to reduce the
 time and space complexity of the basic dynamic programming
 methods. The key idea is based on the observation that only the
-dominant points contributes to the construction of the MLCS. Since the
-number of dominant points can be much smaller than that of all cells
-in the score table $T$, a dominant point approach that only identifies
-the dominant points, without filling the whole score table, can
-greatly reduce the time and space complexity.
+dominant points contributes to the construction of the MLCS (as shown
+in Fig \ref{fig:DM} (b), the shaded cells correspond to the dominant
+points).  Since the number of dominant points can be much smaller than
+that of all cells in the score table $T$, a dominant point approach
+that only identifies the dominant points, without filling the whole
+score table, can greatly reduce the time and space complexity.
 
 The search space of the dominant point based approaches can be
 organized into a Directed Acyclic Graph (DAG): a node in DAG
-represents a match point and an edge $<p,\, q>$ in DAG represents
-$p \prec q$ and $L(q) = L(p) + 1$, i.e., $q$ is a successor of $p$. A
-node in DAG has at most $|\Sigma|$ successors. Initially, the DAG
-contains a source node $(0,\, 0,\, ...,\, 0)$ with no incoming edges
-and an end node $(\infty,\, \infty,\, ...,\, \infty)$ with no outgoing
-edges, in particular, the end node is defined as the successor of
-those nodes without an successor. The DAG can be constructed level by
-level as follows: at first, let $k = 0$ (the level), and
+represents a match point and an edge $\langle p,\, q \rangle$ in DAG
+represents $p \prec q$ and $L(q) = L(p) + 1$, i.e., $q$ is a successor
+of $p$. Particularly, a node in DAG has at most $|\Sigma|$
+successors. Initially, the DAG contains a \emph{source node}
+$(0,\, 0,\, ...,\, 0)$ with no incoming edges and an \emph{end node}
+$(\infty,\, \infty,\, ...,\, \infty)$ with no outgoing edges, in
+particular, the end node is defined as the successor of those nodes
+without an successor. The DAG can be constructed level by level as
+follows: at first, let the level $k = 0$, and
 $D^0 = \{(0,\, 0,\, ...,\, 0)\}$. Next, with a forward iteration
 procedure, the $(k+1)$-dominants $D^{k+1}$ are computed based on the
-$k$-dominants $D^k$. Specifically, each node in $D^k$ is expanded by
-generating all its $|\Sigma|$ successors first, then an pruning
+$k$-dominants $D^k$, and this procedure is denoted as
+$D^k \rightarrow D^{k+1}$. Specifically, each node in $D^k$ is
+expanded by generating all its $|\Sigma|$ successors, then an pruning
 operation called $Minima$ is performed to identify those successors
-who dominants others, and only these dominants are reserved to form
-$D^{k+1}$. This procedure is denoted as $D^k \rightarrow D^{k+1}$.
-Once all the nodes in DAG have been expanded, the whole DAG is
-constructed. In the DAG, a longest path from the source node to the
-end node corresponds to a LCS. Thus the MLCS problem becomes finding
-all the longest paths from the source node to the end node.The main
-drawback of the dominant point based approaches is that the $Minima$
-operation needs to compare among the nodes dimension by dimension,
-which is very time consuming. Figure shows an example of the dominant
-based algorithm processing three sequence.
+who dominant others, and only those dominants are reserved and form
+$D^{k+1}$. Once all the nodes in DAG have been expanded, the whole DAG
+is constructed. In the DAG, a longest path from the source node to the
+end node corresponds to a LCS, and thus, the MLCS problem becomes
+finding all the longest paths from the source node to the end node.
+Fig.  \ref{fig:DAG} shows the DAG constructed by the general dominant
+based algorithms for the same two DNA sequences shown in
+Fig. \ref{fig:DM}. The black nodes in the DAG are generated repeatedly
+while the gray nodes in each level are non-dominant points, and both
+of these nodes will be eliminated by the \emph{Minima} operation. The
+main drawback of the dominant point based approaches is that a lot of
+redundant nodes will be generated and the \emph{Minima} operation
+needs to compare among the match points dimension by dimension, which
+is very time consuming.
+
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.6\textwidth]{./eps/DAG}
+  \caption{The DAG constructed by the general dominant point based
+    algorithms for two sequences ACTAGCTA and TCAGGTAT, in which the
+    black and gray nodes will be eliminated by the \emph{Minima}
+    operation.}
+  \label{fig:DAG}
+\end{figure}
 
 Hunt \cite{Hunt1977} proposed the first dominant point based algorithm
 for two sequences with time complexity $O((r+n)log^n)$, where $r$ is
-the number of all nodes in DAG, and $n$ is the length of the two
+the number of nodes in DAG, and $n$ is the length of the two
 sequences. Afterwards, to further improve the efficiency, a variety of
 dominant point based LCS/MLCS algorithms have been presented. Korkin
-\cite{Korkin2001} proposed the first MLCS algorithm with time
+\cite{Korkin2001} proposed the first parallel MLCS algorithm with time
 complexity $O(|\Sigma|d)$, where $d$ is the number of sequences. Chen
 \cite{Chen2006} presented an efficient MLCS algorithm -- FAST-LCS for
-DNA sequences, it introduced a novel successor table to obtain the
-successors of nodes in constant time and used a pruning operation to
-eliminate the non-dominant nodes in each level. Wang \cite{Wang2011}
-improved the FAST-MLCS algorithm by using a divide-and-conquer
-strategy to eliminate the non-dominant nodes, which is very suitable
-for parallelization, it indicates that the parallelized algorithm
-Quick-DPPAR has gained a near-linear speedup with respect to its
-serial version. It is worth mentioning that Li \cite{Li2012} and Yang
-\cite{Yang2010} made attempts to develop efficient parallel algorithms
+DNA sequences, it introduced a novel data structure called successor
+table to obtain the successors of nodes in constant time and used a
+pruning operation to eliminate the non-dominant nodes in each
+level. Wang \cite{Wang2011} improved the FAST-MLCS algorithm by using
+a divide-and-conquer strategy to eliminate the non-dominant nodes,
+which is very suitable for parallelization, it indicated that the
+parallelized algorithm Quick-DPPAR had gained a near-linear speedup
+compared to its serial version. Li \cite{Li2012} and Yang
+\cite{Yang2010} made efforts to develop efficient parallel algorithms
 on GPUs for the LCS problem and on cloud platform for the MLCS
 problem, respectively. Unfortunately, Yang \cite{Yang2010} is not
-suitable for the general MLCS problem for multiple sequences due to
-the large synchronous cost. Recently, Li \cite{LiICDE} and Linear
-\cite{LIKDD} proposed two algorithms: PTop-MLCS and RLP-MLCS based on
-dominant point, these algorithms used a novel graph model called
-Non-redundant Common Subsequence Graph (NCSG) which can greatly reduce
-the redundant nodes during processing, and adopt a two-passes
-topological sorting procedure to find the MLCS. The authors claimed
-that the time complexity of the proposed algorithms is linear to the
-number of nodes in NCSG.
+suitable for the MLCS problem with multiple sequences due to the large
+synchronous costs. Recently, Li \cite{LiICDE} and Li \cite{LiSIGKDD}
+proposed two algorithms: PTop-MLCS and RLP-MLCS based on dominant
+points, these algorithms used a novel graph model called Non-redundant
+Common Subsequence Graph (NCSG) which can greatly reduce the redundant
+nodes during processing, and adopted a two-passes topological sorting
+procedure to find the MLCS. The authors claimed that the time
+complexity of their algorithms is linear with respect to the number of
+nodes in NCSG.
 
-For large-scale MLCS problems in practice, the traditional algorithms
-usually need a long time and large space to find the optimal solution
-(the real MLCS), to address this, approximate algorithms have been
-developed to quickly produce a suboptimal solution (partial MLCS) and
-gradually improve it when given more time, until an optimal one is
-found. Yang \cite{Yang2013} proposed an approximate algorithm Pro-MLCS
-and its efficient parallelization based on the dominant point
-model. Pro-MLCS can find an approximate solution quickly, which only
-takes around 3 percent of the entire running time, and then
-progressively generate better solutions until obtaining the optimal
-one. Recently, Yang \cite{Yang2014} proposed another two approximate
-algorithms SA-MLCS and SLA-MLCS, SA-MLCS uses an iterative beam
-widening search strategy to reduce space usage during the iterative
-process of finding better solutions. Based on SA-MLCS, SLA-MLCS, a
-space-bounded algorithm, is developed to avoid space usage from
-exceeding available memory.
+In practice, for MLCS problems with multiple sequences, the
+traditional algorithms usually need a long time and large space to
+find the optimal solution (the real MLCS), to address this,
+approximate algorithms have been developed to quickly produce a
+suboptimal solution (partial MLCS) and gradually improve it when given
+more time, until an optimal one is found. Yang \cite{Yang2013}
+proposed an approximate algorithm Pro-MLCS as well as its efficient
+parallelization based on the dominant point model. Pro-MLCS can find
+an approximate solution quickly, which only takes around 3 percent of
+the entire running time, and then progressively generate better
+solutions until obtaining the optimal one. Recently, Yang
+\cite{Yang2014} proposed another two approximate algorithms SA-MLCS
+and SLA-MLCS. SA-MLCS used an iterative beam widening search strategy
+to reduce space usage during the iterative process of finding better
+solutions. Based on SA-MLCS, SLA-MLCS, a space-bounded algorithm, is
+developed to avoid space usage from exceeding available memory.
 
+
+\section{PM-MLCS: A New Fast MLCS Algorithm}
+\label{sec:PM-MLCS}
 
 
 \section{Conclusion and Future Works}
@@ -388,6 +426,11 @@ Engineering, IEEE Transactions on, 23(3):321–334, 2011.
   automaton based on cloud computing for the multiple longest common
   subsequences search. Mathematical Problems in Engineering, 2012,
   2012.
+
+\bibitem{Yang2010} J. Yang, Y. Xu, and Y. Shang. An efficient parallel
+  algorithm for longest common subsequence problem on GPUs. In
+  Proceedings of the World Congress on Engineering, volume 1, pp.
+  499–504, 2010.
 
 \bibitem{Yang2013} J. Yang, Y. Xu, and Y. Shang. A new progressive
   algorithm for a multiple longest common subsequences problem and its
