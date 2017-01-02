@@ -27,8 +27,8 @@
 \begin{document}
 
 
-\title{A Efficient Exact Algorithm for Multiple Longest Common
-  Subsequences (MLCS) Problem Based on Path Marking}
+\title{An Efficient Algorithm for Multiple Longest Common Subsequences
+  (MLCS) Problem Based on Path Marking}
 
 \author{Zhan Peng, Yuping Wang\footnote{Corresponding author}~,}
 
@@ -56,11 +56,10 @@
   path marking technique can real-timely mark the longest path from
   the source node to the current node, and once the graph has been
   constructed the longest paths corresponding to every MLCS can be
-  found immediately. The experimental results demonstrate that,
-  comparing with the expensive ``Minima'' operation that is widely
-  used in the existing algorithms, the path marking is much more
-  efficient, and therefore our algorithm is faster than those
-  algorithms.
+  found immediately. The experimental results show that, comparing
+  with the expensive ``Minima'' operation that is widely used in many
+  existing algorithms, the path marking is much more efficient, and
+  therefore our algorithm performs better than those algorithms.
 
 \end{abstract}
 
@@ -75,7 +74,7 @@
 
 
 Many kinds of biological data can be represented as a sequence of
-symbols. For instance, proteins [2] are sequences over 20 different
+symbols. For instance, proteins are sequences over 20 different
 symbols (amino acids), and DNA (genes) can be represented as sequences
 over four symbols A, C, G and T corresponding to the four bases.
 Measuring the similarity of biological sequences is a fundamental
@@ -83,78 +82,79 @@ problem in bioinformatics, which can be used in many applications such
 as cancer diagnoses, detection of the species’ common origin [2],
 etc. One of the most important ways to measure the similarity of
 biological sequences is to find their Multiple Longest Common
-Subsequences (MLCS), which has been proved to be an NP-hard problem []
-. Traditionally, the works are focusing on either the simplest case of
-two sequences, also known as the Longest Common Subsequences (LCS)
-problem [24], [36], [39], [45], or the problem’s special case of
-three sequences [21], [22]. Although many algorithms have been
-proposed for the general case of the problem, they are not very
-efficient in practice for large-size problems with many sequences due
-to high time and space complexity. Particularly, with the successful
-implementation of the human genome project and the development of the
-next-generation sequencing techniques, the amount of biological
-sequences (as well as other types of sequences from various fields)
-are growing explosively [3]. Therefore, it is very important and
-valuable to design more efficient MLCS algorithm to process large
-amount of biological (and other types) sequences.
+Subsequences (MLCS), which has been proved to be an NP-hard problem
+\cite{Maier1978}. Traditionally, the works are focusing on either the
+simplest case of two sequences, also known as the Longest Common
+Subsequences (LCS) problem, or the problem’s special case of three
+sequences. Although many algorithms have been proposed for the general
+case of the problem, they are not very efficient in practice for
+large-size data with many sequences due to high time and space
+complexity. Particularly, with the successful implementation of the
+human genome project and the development of the next-generation
+sequencing techniques, the amount of biological sequences (as well as
+other types of sequences from various fields) are growing explosively
+[3]. Therefore, it is very important and valuable to design more
+efficient MLCS algorithm to process large amount of biological (and
+other types) sequences.
 
-In this paper, we proposed a fast algorithm for finding MLCS of many
-sequences. Our algorithm is based on the dominant point model, in
-which the dominant points produced during processing are organized to
-form a Directed Acyclic Graph (DAG), and each of the longest paths
+In this paper, we proposed a fast algorithm --- PM-MLCS for finding
+MLCS of many sequences. PM-MLCS is based on the dominant point model,
+in which the dominant points produced during processing are organized
+to form a Directed Acyclic Graph (DAG), and each of the longest paths
 from the source node to the end node corresponds to a MLCS. Different
-from the other dominant point based algorithms that using a
-time-consuming \emph{Minima} operation to delete the redundant nodes,
-and then search for the longest paths from the source node to the end
-node to find the MLCS, our method employs a technical called
-\emph{path marking}, whenever a node is generated, the longest path
-from the source node to the new node is updated immediately, and once
-the DAG is constructed, all the MLCS can be found directly from the
-end node back to the source node by the marked path. The experiments
-shows that the \emph{path marking} technique is much efficient than
-the \emph{Minima} operation, so that our algorithm is much faster than
-the compared algorithms.
+from the other dominant point based algorithms that adopt a
+time-consuming \emph{Minima} operation to eliminate the redundant
+nodes, and then search for the longest paths from the source node to
+the end node to find the MLCS, PM-MLCS employs a technical called
+\emph{path marking} which has the ability that whenever a node is
+generated, the longest path from the source node to the new node is
+updated immediately, and once the DAG is constructed, all the MLCS can
+be found directly from the end node back to the source node by the
+marked path. The experimental results show that the \emph{path
+  marking} technique is much efficient than the \emph{Minima}
+operation, so that our algorithm is much faster than the compared
+algorithms.
 
-The this paper is organized as follows: Section \ref{sec:related
-  works} introduces some preliminaries and reviews the related works
-in the MLCS problem. Section \ref{sec:notations} lists the notations
-and terminology used in this paper. In section \ref{sec:algorithm},
-the our new algorithm is presented in details. In section
-\ref{sec:experiments}, experimental results comparing the performances
-of the new algorithms with existing ones are presented. In Section
-\ref{sec:conclusion} we summarize the paper.
+This paper is organized as follows: Section \ref{sec:related works}
+introduces some preliminaries and reviews the related works. Section
+\ref{sec:notations} lists the notations and terminology used in this
+paper. In section \ref{sec:algorithm}, the our new algorithm is
+presented in details. In section \ref{sec:experiments}, experimental
+results comparing the performances of the new algorithms with existing
+ones are presented. In Section \ref{sec:conclusion} we summarize the
+paper.
 
 \section{Preliminaries and Related Works}
 \label{sec:related works}
 
-In this section, we define some notations and terminology used in this
-paper and review some related works in the MLCS problem.
+In this section, we define some notations and terminologies used in
+this paper and review some related works in the MLCS problem.
 
-First of all, let $\Sigma$ represent a finite alphabet for the
-sequences.  For example, for the DNA sequences,
-$\Sigma=\{A, C, T, G\}$.
+First of all, let $\Sigma$ denote a finite alphabet for the sequences.
+For example, for the DNA sequences, $\Sigma=\{A, C, T, G\}$.
 
 \textbf{Definition 1.} Let $s=c_1c_2...c_n$ be a sequence of length
-$n$ over $\Sigma$, where the $i$-th character of $s$ is denoted by
+$n$ over $\Sigma$, and the $i$-th character of $s$ is denoted by
 $s[i]=c_i$. A \emph{subsequence} of $s$ is a sequence that can be
 obtained by deleting zero or more (not necessarily consecutive)
 characters from $s$. Formally, $s'=c_{i_1}c_{i_2}...c_{i_k}$ is called
-a subsequence of $s$, if for $1 \leq j \leq k$, there is
-$1 \leq i_j \leq n$, and for all $r$ and $t$, $1 \leq r < t \leq k$,
+a subsequence of $s$, if there is $1 \leq i_j \leq n$
+($1 \leq j \leq k$), and for all $r$ and $t$ such that
+$1 \leq r < t \leq k$,
 there is $i_r < i_t$.\\
 
-\textbf{Definition 2.} Given $d$ sequences: $s_1, s_2, ..., s_d$ over
-$\Sigma$. A Longest Common Subsequence (\emph{LCS}) of the $d$
+\textbf{Definition 2.} Given $d$ sequences $s_1, s_2, ..., s_d$ over
+$\Sigma$, a Longest Common Subsequence (\emph{LCS}) of the $d$
 sequences is a sequence $lcs$ such that: (1) $lcs$ is a subsequence of
 all $s_i$ ($1 \leq i \leq d$) (2) there is no sequence satisfying (1)
 and longer than $lcs$.\\
 
-In general, given $d$ sequences, there usually exists more than one
-LCS. For example, given three DNA sequences $s_1 = ACTAGTGC$,
-$s_2 = TGCTAGCA$ and $s_3 = CATGCGAT$, there are two LCSs of length 4,
-which are $lcs_1 = CAGC$ and $lcs_2 = CTGC$, respectively. The MLCS
-problem is to find all LCSs of three or more sequences. For the
-special case of two sequences, the problem is usually called the LCS
+Generally, there exists more than one LCS for multiple sequences. For
+example, given three DNA sequences $s_1 = ACTAGTGC$, $s_2 = TGCTAGCA$
+and $s_3 = CATGCGAT$, there exists two LCSs of length 4, which are
+$lcs_1 = CAGC$ and $lcs_2 = CTGC$, respectively. The MLCS problem is
+to find all LCSs of three or more sequences. For the special case of
+two sequences, the problem is usually called the LCS
 problem. Particularly, specific algorithms developed for LCS problem
 are generally inefficient for
 MLCS problem.\\
@@ -173,7 +173,7 @@ $s_1,\, s_2,\,...,\, s_d$ of length $n_1,\, n_2,\, ...,\, n_d$
 respectively, these approaches recursively construct a score table $T$
 with $n_1 \times n_2 \times ... \times n_d$ cells, in which
 $T[i_1,\, i_2,\, ...,\, i_d]$ records the length of the LCSs of the
-prefixes $s_1[1...i_1]$, $s_2[1...i_2]$, ..., $s_d[1...i_d]$, and
+prefixes $s_1[1...i_1]$, $s_2[1...i_2]$, ..., $s_d[1...i_d]$.
 $T[i_1,\, i_2,\, ...,\, i_d]$ can be computed recursively by the
 following formula:
 
@@ -187,28 +187,32 @@ following formula:
   \end{cases}
 \end{equation*}
 
-where $\bar{T} = \{T[i_1-1,\, i_2,\, ...,\, i_d],\, T[i_1,\, i_2-1,\,
-...,\, i_d],\, ...,\, T[i_1,\, i_2,\, ...,\, i_d-1]\}$. Once the score
-table $T$ is constructed, the MLCS can be collected by tracing back
-from the last cell $T[n_1,\, n_2,\, ...,\, n_d]$ to the first cell
+where
+$\bar{T} = \{T[i_1-1,\, i_2,\, ...,\, i_d],\, T[i_1,\, i_2-1,\, ...,\,
+i_d],\, ...,\, T[i_1,\, i_2,\, ...,\, i_d-1]\}$. Once the score table
+$T$ is constructed, the MLCS can be collected by tracing back from the
+last cell $T[n_1,\, n_2,\, ...,\, n_d]$ to the first cell
 $T[0,\, 0,\, ...,\, 0]$. Fig. \ref{fig:DM} (a) shows an example of the
-score table $T$ for two sequences $s_1 = ACTAGCTA$ and $s_2 =
-TCAGGTAT$. Their MLCS are $TAGTA$ and $CAGTA$ which can be found by
-tracing back from $T[8,\, 8]$ to $T[0,\, 0]$, as shown in Fig. [] (b).
+score table $T$ for two sequences $s_1 = ACTAGCTA$ and
+$s_2 = TCAGGTAT$. The MLCS of these two sequences, which are $TAGTA$
+and $CAGTA$, can be found by tracing back from $T[8,\, 8]$ to
+$T[0,\, 0]$, as shown in Fig. \ref{fig:DM} (b).
 
 
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=0.9\textwidth]{./eps/DM}
-  \caption{The score table of two DNA sequences ACTAGCTA and TCAGGTAT.}
+  \caption{(a) The score table of the two DNA sequences ACTAGCTA and
+    TCAGGTAT. (b) Constructing the MLCS, where the shaded cells
+    conspond to dominant points.}
   \label{fig:DM}
 \end{figure}
 
 Obviously, the time and space complexity of dynamic programming based
 approaches for a MLCS problem with $d$ sequences of length $n$ are
-both $O(n^d)$ \cite{Hsu1984}, therefore, those approaches can not be
-applied to MLCS problems with more than two sequences in practice. To
-reduce the complexity of dynamic programming based approaches, various
+both $O(n^d)$ \cite{Hsu1984}, therefore, those approaches are not
+practical for MLCS problems with more than two sequences. To reduce
+the complexity of dynamic programming based approaches, various
 methods have been proposed \cite{Hirschberg1977},
 \cite{Apostolico1992}, \cite{Masek1980},
 \cite{Rick1994}. Unfortunately, these methods primarily address the
@@ -219,40 +223,44 @@ LCS problem of two sequences.
 
 Many works have been proposed to improve dynamic programming based
 approaches in order to process large size data, among which the
-dominant point approaches are the most efficient. Before introducing
-the dominant point based approaches, some terminologies are introduced
+dominant point approaches are the most efficient. Before discussing
+the dominant point based approaches, some definitions are introduced
 first:
 
-\textbf{Definition 3.} Given $d$ sequences: $s_1,\, s_2,\, ...,\, s_d$
-over $\Sigma$. A point $p = (p_1,\, p_2,\, ...,\, p_d)$ is called a
-\emph{match point} of the sequences, if $s_1[p_1] = s_2[p_2] = ... =
-s_d[p_d] = \delta$, where $\delta$ is the character corresponding to
-the matched point $p$ and denoted by $C(p)$.\\
+\textbf{Definition 3.} Given $d$ sequences $s_1,\, s_2,\, ...,\, s_d$
+over $\Sigma$, a vector $p = (p_1,\, p_2,\, ...,\, p_d)$ is called a
+\emph{match point} of the $d$ sequences, if
+$s_1[p_1] = s_2[p_2] = ... = s_d[p_d] = \delta$, where $\delta$ is the
+character corresponding to
+the matched point $p$ and is denoted by $C(p)$.\\
 
-\textbf{Definition 4.} Given two match points $p = (p_1,\, p_2,\,
-...,\, p_d)$ and $q = (q_1,\, q_2,\, ...,\, q_d)$ of $d$ sequences, we
-say that $p = q$, if and only if $p_i = q_i$ ($1 \leq i \leq d$). If
-$p_i \leq q_i$ ($1 \leq i \leq d$), we say $p$ \emph{dominates} $q$,
-denoted by $p \preceq q$. Further, if $p_i < q_i$ ($1 \leq i \leq d$),
-we say $p$ \emph{strongly dominates} $q$, denoted by $p \prec q$.  If
-$p \prec q$ and there is no match point $r$ such that $p \prec r \prec
-q$ and $C(q) = C(r)$, we call $q$ a \emph{successor} of $p$, or $p$ a
-\emph{precursor} of $q$. In particular, one match point has at most
-$|\Sigma|$ successors with each character in $\Sigma$ corresponds to
-one successor. \\
+\textbf{Definition 4.} Given two match points
+$p = (p_1,\, p_2,\, ...,\, p_d)$ and $q = (q_1,\, q_2,\, ...,\, q_d)$
+of $d$ sequences, we say that $p = q$, if and only if $p_i = q_i$
+($1 \leq i \leq d$). On the other hand, if $p_i \leq q_i$
+($1 \leq i \leq d$), we say $p$ \emph{dominates} $q$, which is denoted
+by $p \preceq q$. Moreover, if $p_i < q_i$ ($1 \leq i \leq d$), we say
+$p$ \emph{strongly dominates} $q$, which is denoted by $p \prec q$.
+If $p \prec q$ and there is no match point $r$ such that
+$p \prec r \prec q$ and $C(q) = C(r)$, we call $q$ a \emph{successor}
+of $p$, or $p$ a \emph{precursor} of $q$. In particular, one match
+point can have at most $|\Sigma|$ successors with each successor
+corresponds to one character in
+$\Sigma$. \\
 
-\textbf{Definition 5.} The \emph{level} of a match point $p = (p_1,\,
-p_2,\, ...,\, p_d)$ is defined to be $L(p) = T[p_1,\, p_2,\, ...,\,
-p_d]$, where $T$ is the score table constructed by formula []. A match
-point $p$ is called a \emph{k-dominant point} (\emph{k-dominants} for
-short) if and only if: (1) $L(p) = k$ (2) there is no other match
-point $q$ such that: $L(q) = k$ and $q \preceq q$. All the
-$k$-dominants form a set denoted by $D^k$.
+\textbf{Definition 5.} The \emph{level} of a match point
+$p = (p_1,\, p_2,\, ...,\, p_d)$ is defined to be
+$L(p) = T[p_1,\, p_2,\, ...,\, p_d]$, where $T$ is the score table
+constructed by formula []. A match point $p$ is called a
+\emph{k-dominant point} (\emph{k-dominant} for short) if and only if:
+(1) $L(p) = k$ (2) there is no other match point $q$ such that:
+$L(q) = k$ and $q \preceq p$. All the $k$-dominants form a set denoted
+by $D^k$.
 
 The motivation of the dominant point based approaches is to reduce the
 time and space complexity of the basic dynamic programming
 methods. The key idea is based on the observation that only the
-dominant points contributes to the construction of the MLCS (as shown
+dominant points contribute to the construction of the MLCS (as shown
 in Fig \ref{fig:DM} (b), the shaded cells correspond to the dominant
 points).  Since the number of dominant points can be much smaller than
 that of all cells in the score table $T$, a dominant point approach
@@ -261,33 +269,30 @@ score table, can greatly reduce the time and space complexity.
 
 The search space of the dominant point based approaches can be
 organized into a Directed Acyclic Graph (DAG): a node in DAG
-represents a match point and an edge $\langle p,\, q \rangle$ in DAG
-represents $p \prec q$ and $L(q) = L(p) + 1$, i.e., $q$ is a successor
-of $p$. Particularly, a node in DAG has at most $|\Sigma|$
-successors. Initially, the DAG contains a \emph{source node}
-$(0,\, 0,\, ...,\, 0)$ with no incoming edges and an \emph{end node}
-$(\infty,\, \infty,\, ...,\, \infty)$ with no outgoing edges, in
-particular, the end node is defined as the successor of those nodes
-without an successor. The DAG can be constructed level by level as
-follows: at first, let the level $k = 0$, and
-$D^0 = \{(0,\, 0,\, ...,\, 0)\}$. Next, with a forward iteration
-procedure, the $(k+1)$-dominants $D^{k+1}$ are computed based on the
-$k$-dominants $D^k$, and this procedure is denoted as
-$D^k \rightarrow D^{k+1}$. Specifically, each node in $D^k$ is
-expanded by generating all its $|\Sigma|$ successors, then an pruning
-operation called $Minima$ is performed to identify those successors
-who dominant others, and only those dominants are reserved and form
-$D^{k+1}$. Once all the nodes in DAG have been expanded, the whole DAG
-is constructed. In the DAG, a longest path from the source node to the
-end node corresponds to a LCS, and thus, the MLCS problem becomes
+represents a match point, while an edge $\langle p,\, q \rangle$ in
+DAG represents that $q$ is a successor of $p$, i.e., $p \prec q$ and
+$L(q) = L(p) + 1$.  Initially, the DAG contains only a \emph{source
+  node} $(0,\, 0,\, ...,\, 0)$ with no incoming edges and an \emph{end
+  node} $(\infty,\, \infty,\, ...,\, \infty)$ with no outgoing
+edges. Then, the DAG can be constructed level by level as follows: at
+first, let the level $k = 0$, and $D^0 = \{(0,\, 0,\, ...,\,
+0)\}$. Next, with a forward iteration procedure, the $(k+1)$-dominants
+$D^{k+1}$ are computed based on the $k$-dominants $D^k$, and this
+procedure is denoted by $D^k \rightarrow D^{k+1}$. Specifically, each
+node in $D^k$ is expanded by generating all its $|\Sigma|$ successors,
+then a pruning operation called $Minima$ is performed to identify
+those successors who dominant others, and only those dominants are
+reserved to form $D^{k+1}$. Once all the nodes have been expanded, the
+whole DAG is constructed, in which a longest path from the source node
+to the end node corresponds to a LCS, thus, the MLCS problem becomes
 finding all the longest paths from the source node to the end node.
-Fig.  \ref{fig:DAG} shows the DAG constructed by the general dominant
-based algorithms for the same two DNA sequences shown in
-Fig. \ref{fig:DM}. The black nodes in the DAG are generated repeatedly
-while the gray nodes in each level are non-dominant points, and both
-of these nodes will be eliminated by the \emph{Minima} operation. The
-main drawback of the dominant point based approaches is that a lot of
-redundant nodes will be generated and the \emph{Minima} operation
+Fig. \ref{fig:DAG} shows the DAG of the two DNA sequences $ACTAGCTA$
+and $TCAGGTAT$ constructed by the general dominant based
+algorithms. The black nodes in the DAG are duplicated points, while
+the gray nodes in each level are non-dominant points, and both of
+these nodes will be eliminated by the \emph{Minima} operation. The
+main drawbacks of the dominant point based approaches are that a lot
+of redundant nodes will be generated and the \emph{Minima} operation
 needs to compare among the match points dimension by dimension, which
 is very time consuming.
 
@@ -295,16 +300,16 @@ is very time consuming.
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=0.6\textwidth]{./eps/DAG}
-  \caption{The DAG constructed by the general dominant point based
-    algorithms for two sequences ACTAGCTA and TCAGGTAT, in which the
-    black and gray nodes will be eliminated by the \emph{Minima}
-    operation.}
+  \caption{The DAG of the two sequences $ACTAGCTA$ and $TCAGGTAT$
+    constructed by the general dominant point based algorithms, in
+    which the black and gray nodes will be eliminated by the
+    \emph{Minima} operation.}
   \label{fig:DAG}
 \end{figure}
 
 Hunt \cite{Hunt1977} proposed the first dominant point based algorithm
 for two sequences with time complexity $O((r+n)log^n)$, where $r$ is
-the number of nodes in DAG, and $n$ is the length of the two
+the number of nodes in DAG and $n$ is the length of the two
 sequences. Afterwards, to further improve the efficiency, a variety of
 dominant point based LCS/MLCS algorithms have been presented. Korkin
 \cite{Korkin2001} proposed the first parallel MLCS algorithm with time
@@ -328,13 +333,13 @@ points, these algorithms used a novel graph model called Non-redundant
 Common Subsequence Graph (NCSG) which can greatly reduce the redundant
 nodes during processing, and adopted a two-passes topological sorting
 procedure to find the MLCS. The authors claimed that the time
-complexity of their algorithms is linear with respect to the number of
-nodes in NCSG.
+complexity of their algorithms is linear to the number of nodes in
+NCSG.
 
-In practice, for MLCS problems with multiple sequences, the
+In practice, for MLCS problems with large number of sequences, the
 traditional algorithms usually need a long time and large space to
 find the optimal solution (the real MLCS), to address this,
-approximate algorithms have been developed to quickly produce a
+approximate algorithms have been investigated to quickly produce a
 suboptimal solution (partial MLCS) and gradually improve it when given
 more time, until an optimal one is found. Yang \cite{Yang2013}
 proposed an approximate algorithm Pro-MLCS as well as its efficient
@@ -352,22 +357,339 @@ developed to avoid space usage from exceeding available memory.
 \section{PM-MLCS: A New Fast MLCS Algorithm}
 \label{sec:PM-MLCS}
 
+In this section, we present a new algorithm -- PM-MLCS to find the
+MLCS of multiple sequences. The new algorithm is based on dominant
+points model and a novel technique called path marking. Before
+describing its detailed procedure, some data structures used are
+introduced first.
 
-\section{Conclusion and Future Works}
-\label{sec:conclusion}
+\subsection{Data Structures}
+\label{sec:data structures}
 
-In this paper, we propose a Fast Engine for Multi-Pattern Matching
-(\textsf{FEMPM}) which includes a filter part and a verification
-part. The filter part is used to quickly filter out the positions that
-are impossible to match any pattern, while the verification part is
-used to verify the potential positions. The verification part used a
-data structure called Adaptive Matching Tree (AMT) which can be
-constructed to fit the feature of the given pattern set. Owing to the
-scalability and compactness of AMT, \textsf{FEMPM} offers a good
-support for large-scale pattern sets. Moreover it can improve the
-robustness of \textsf{FEMPM} for pattern sets with various $lsp$s. In
-the future, we will try to design more efficient inner structures of
-the tree nodes.
+\subsubsection{Successor Table}
+\label{sec:successor table}
+
+One of the fundamental tasks during constructing the DAG is to
+efficiently generate the successors of every node. To achieve this,
+before constructing the DAG, a \emph{successor table} \cite{Chen2006}
+is built for each sequence to enable the successors of each node be
+generated in constant time. Given a sequence $s=c_1c_2...c_n$, its
+corresponding successor table (denoted by $ST$) is a two-dimensional
+array with $|\Sigma| \times (n+1)$ elements, in which the element of
+$i$-th row and $j$-th column in $ST$ (denoted by $ST[i, j]$) is
+defined as follows:
+$$ST[i,j]=min\{m\;|\;c_m=\sigma_i,\; m \geq 1, m > j,\; 1 \leq i \leq
+|\Sigma|,\; 0 \leq j \leq n\}$$ where $\sigma_i$ is the $i$-th
+character in $\Sigma$. In fact, $ST[i,j]$ specifies the position of
+the first occurrence of character $\sigma_i$ in $s$, starting from the
+$(j+1)$-st position. For instance, the successor tables of the two DNA
+sequences $ACTAGCTA$ and $TCAGGTAT$ are shown in Fig.\ref{fig:ST} (a)
+and Fig.\ref{fig:ST} (b) respectively. Obviously, given $d$ sequences
+of length $n$, all the corresponding successor tables can be built in
+$O(d|\Sigma|n)$ time.
+
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.8\textwidth]{./eps/ST}
+  \caption{(a) The successor table of the sequence ACTAGCTA. (b) The
+    successor table of the sequence TCAGGTAT.}
+  \label{fig:ST}
+\end{figure}
+
+
+By referring to the successor tables, the successors of one node can
+be generated in constant time. For instance, the successors of the
+node $(2, 2)$ in Fig.\ref{fig:DAG} are
+$(T[1, 2],\;T[1, 2]) = (4, 3)$,\, $(T[2, 2],\;T[2, 2]) = (6, -)$,\,
+$(T[3, 2],\;T[3, 2]) = (5, 4)$ and $(T[4, 2],\;T[4, 2]) = (4, 3)$,
+corresponding to $A$, $C$, $G$, and $T$ respectively, where $(6, -)$
+does not exist, which means $(2, 2)$ has no successor corresponding to
+$C$, and actually a node can have no successors at all. Obviously,
+given $d$ sequences, all the successors of one node can be generated
+in $O(|\Sigma|d)$ time.
+
+\subsubsection{The Structure of the Node in DAG}
+\label{sec:Node}
+
+For each node, say $t$, in DAG, it contains the following kinds of
+information:
+
+\begin{itemize}
+\item The match point vector corresponding to $t$, which is also the
+  unique identifier of $t$.
+\item $D(t)$: the \emph{length} of the longest path(s) from the source
+  node to $t$.
+\item $Suc(t)$: all the \emph{successors} of $t$, i.e.,
+  $Suc(t) = \{s\;|\; s$ is a successor of $t\}$.
+\item $Pre(t)$: all the \emph{precursors} of $t$ which are in the
+  longest paths from the source node to $t$, i.e.,
+  $Pre(t) = \{p\;|\; t \in Suc(p)$ and $D(p) = D(t) - 1$\}. These
+  precursors are called \emph{key precursors}.
+\end{itemize}
+
+Note that, for $Pre(t)$, not all precursors of $t$ are kept, instead,
+only those key precursors which are in the longest paths from the
+source node to $t$ are reserved. By tracing the key precursors from
+the end node to source node, all the longest paths can be traversed
+backward, accordingly, all the MLCS can be obtained. Further, for
+$Suc(t)$ and $Pre(t)$, only the pointers to the corresponding nodes
+are kept.
+
+\subsubsection{Global Data Structures}
+\label{sec:auxiliary}
+
+\begin{itemize}
+\item $DAG$ : the data structure to maintain all the generated nodes.
+\item $Q$ : a first-in-first-out queue to store the nodes for
+  expanding.
+\end{itemize}
+
+In our implementation, the $DAG$ is implemented as $|\Sigma|$ number
+of hash tables with each table corresponds to one character in
+$\Sigma$.  Whenever a new node (successor) $t$ is generated, it is
+kept in the hash table corresponding to $C(t)$.
+
+Another data structure $Q$ is used to keep the nodes for expanding.
+Whenever a new node is created, it is inserted into the end of $Q$,
+while the node at beginning of $Q$ is the one to be expanded next.
+
+\subsection{The Procedure of the PM-MLCS}
+\label{sec:PM-MLCS}
+
+In general, the procedure of PM-MLCS can be divided into two phases:
+in the first phase, the DAG is constructed and all the longest paths
+from the source node to the end node are marked in the meantime; in
+the second phase, all the longest paths are traversed backward from
+the end node to the source node, and all the corresponding MLCS are
+obtained.
+
+Initially, the DAG contains only the source node and the end node.
+Then from the source node, the DAG is constructed level by level by
+repeatedly expanding the newly created nodes. Suppose the node $t$ is
+being expanded, and one of the successors of $t$, say $s$, (actually
+the match point vector of $s$) is obtained by referring to the
+successor table. Depending on whether $s$ has been created before
+(whether there exists a node already containing the match point
+vector), different operations are carried out to construct the DAG:
+
+\begin{enumerate}
+\item If $s \notin DAG$, the following operations are performed:
+  \begin{enumerate}
+  \item $DAG \leftarrow DAG \cup \{s\}$
+  \item $Suc(t) \leftarrow Suc(t) \cup \{s\}$
+  \item $Pre(s) \leftarrow \{t\}$
+  \item $D(s) \leftarrow D(t) + 1$
+  \item Insert $s$ to the end of $Q$.
+  \end{enumerate}
+
+  That is, if $s$ is a new node which has not been created before, $s$
+  will be created first and then incorporated into $DAG$. Next, the
+  successor/key precursor relationships between $t$ and $s$ are
+  constructed. Obviously, the length of the longest path from the
+  source node to $s$ is equal to $D(t)+1$. Then, $s$ will be inserted
+  to $Q$ for further expanding. Fig.\ref{fig:case1} shows this case,
+  where the wavy arrow indicates the paths from the source node to
+  $t$, and the straight/dashed arrows indicate the successor/key
+  precursor relationships, respectively.
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.8\textwidth]{./eps/case1}
+  \caption{If $s$ has not been created before, create it first and
+    then insert it to DAG. }
+  \label{fig:case1}
+\end{figure}
+  
+\item If $s \in DAG$, i.e., $s$ has already been created before, it
+  needs not to be created any more. Depending on the relation between
+  $D(t)+1$ and $D(s)$, different update operations will be carried
+  out:
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=1.0\textwidth]{./eps/3cases}
+  \caption{The update operations for node $t$ and its successor $s$,
+    which is based on the relation between $D(t)+1$ and $D(s)$.}
+  \label{fig:3cases}
+\end{figure}
+
+%$Source ~ Node \rightarrow ... \rightarrow t \rightarrow s$
+\begin{enumerate}[i]
+  \item If $D(t)+1 < D(s)$, $Suc(t) \leftarrow Suc(t) \cup \{s\}$ is
+    performed. This means that if the paths from the source node
+    through $t$ to $s$ are shorter than the current longest paths to
+    $s$, the only thing needs to do is adding $s$ to the successors of
+    $t$ (after that, the next successor of $t$ can be processed).
+    Fig. \ref{fig:3cases} (a) shows this case, where $s$ has two key
+    precursors ($a$ and $b$) as well as three successors ($c$, $d$ and
+    $e$), for clarity, the other successors and key precursors of $t$
+    are not depicted in the figure.
+
+  \item If $D(t)+1 = D(s)$, perform
+    $Suc(t) \leftarrow Suc(t) \cup \{s\}$ and
+    $Pre(s) \leftarrow Pre(s) \cup \{t\}$. This case is that if there
+    exists paths from the source node through $t$ to $s$ having the
+    same length with the current longest path to $s$, all these paths
+    will be the longest paths from the source node to
+    $t$. Fig.\ref{fig:3cases} (b) shows this case, where $t$ is added
+    to the key precursors of $s$.
+
+  \item If $D(t)+1 > D(S)$, perform
+    $Suc(t) \leftarrow Suc(t) \cup \{s\}$, $Pre(s) \leftarrow \{t\}$,
+    $D(s) \leftarrow D(t) + 1$ and $Update(Suc(s))$ in order. This is
+    the most complicated case -- if there exists paths from the source
+    node through $t$ to $s$ longer than the current longest paths to
+    $s$, the longest paths to $s$ will be updated accordingly. Fig
+    \ref{fig:3cases} (c) shows this case, where the old key precursors
+    of $s$ are deleted and $t$ becomes the new key precursor of
+    $s$. Note that, since the longest paths to $s$ have been changed,
+    the longest paths to the successors of $s$ may also be changed
+    accordingly. Therefore, a $Update$ operation is performed on each
+    successor of $s$, as shown in Fig. \ref{fig:update}.  Suppose $s$
+    has three successors $c$, $d$ and $e$, and there are
+    $D(s) < D(c)$, $D(s) = D(d)$ and $D(s) < D(e)$, respectively (note
+    that, $D(S)$ has already been updated to $D(t)+1$). According to
+    the three cases we have just discussed, no actions need be done to
+    successor $c$; for successor $d$, add $s$ to its key precursors;
+    for successor $e$, delete its old key precursors and let $s$ be
+    its new key precursor, analogously, since the longest paths to $e$
+    have been changed, the successors of $e$ should also be updated
+    recursively, furthermore this updating procedure will be repeated
+    until encountering the end node.
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.9\textwidth]{./eps/update}
+  \caption{Update the successors of $s$. (a) Before updating. (b)
+    After updating, the successors of $e$ needs to be updated
+    recursively.}
+  \label{fig:update}
+\end{figure}
+
+\end{enumerate}
+\end{enumerate}
+
+The pseudocode of constructing the DAG by our PM-MLCS is presented in
+Algorithm \ref{alg:DAG}. The $source$ and $end$ denote the source node
+and end node respectively, and the operations for updating node $t$
+and its successor $s$ are wrapped to a recursive sub-procedure called
+$Update(t, s)$. It is worth pointing out that if a node has no
+successors, the end node is defined to be its
+successor. Fig.\ref{fig:path_marking} (a) shows an example of the
+constructed DAG for the two sequences $s_1 = ACTAGCTA$ and $s_2 =
+TCAGGTAT$ by using Algorithm \ref{alg:DAG}. The dashed arrows point to
+the key precursors, and the length of longest paths to each node is
+shown below that node. Clearly, the length of the MLCS is equal to
+$D(end)-1$.
+
+Once the DAG has been constructed, by tracing the key precursors from
+the end node to source node, all the longest paths can be traversed
+backward. This traversing procedure can be done by a simple
+depth-first walk from the end node, and the result longest paths are
+shown in Fig.\ref{fig:path_marking} (b), obviously, the MLCS are
+$CAGTA$ and $TAGTA$.
+
+\begin{algorithm}
+  \caption{PM-MLCS: Construction of the DAG}\scriptsize
+  \label{alg:DAG}
+  \begin{algorithmic}[1]
+    \REQUIRE ~~\\
+    The successor tables of the sequences.\\
+    \ENSURE ~~\\
+    The DAG with all longest paths marked.
+    \STATE
+    \STATE $Pre(source) \leftarrow \emptyset$, $Suc(source)
+    \leftarrow \emptyset$, $D(source) \leftarrow 0$
+    \STATE $Pre(end) \leftarrow \emptyset$, $Suc(end)
+    \leftarrow \emptyset$, $D(end) \leftarrow 0$
+    \STATE $DAG \leftarrow \{source, end\}$
+    \STATE $Q \leftarrow \{source\}$
+    \STATE
+    \WHILE{$Q \neq \emptyset$}
+    \STATE $t \leftarrow $ The node at the beginning of $Q$
+    \FOR {each successor $s$ of $t$}
+    \IF{$s \notin DAG$}
+    \STATE $DAG \leftarrow DAG \cup \{s\}$
+    \STATE $Suc(t) \leftarrow Suc(t) \cup \{s\}$
+    \STATE $Pre(s) \leftarrow \{t\}$
+    \STATE $D(s) \leftarrow D(t) + 1$
+    \STATE Insert $s$ to the end of $Q$.
+    \ELSE
+    \STATE $Update(t, s)$ 
+    \ENDIF
+    \ENDFOR
+    \IF{$t$ has no successor}
+    \STATE $Suc(t) \leftarrow \{end\}$
+    \STATE $Update(t, end)$
+    \ENDIF 
+    \ENDWHILE
+    \STATE
+    \STATE \textbf{Update(t, s)}
+    \STATE
+    \IF{$D(t)+1 < D(s)$}
+    \STATE $Suc(t) \leftarrow Suc(t) \cup \{s\}$
+    \ELSIF{$D(t)+1 = D(S)$}
+    \STATE $Suc(t) \leftarrow Suc(t) \cup \{s\}$
+    \STATE $Pre(s) \leftarrow Pre(s) \cup \{t\}$
+    \ELSE
+    \STATE $Suc(t) \leftarrow Suc(t) \cup \{s\}$
+    \STATE $Pre(s) \leftarrow \{t\}$
+    \STATE $D(s) \leftarrow D(t) + 1$
+    \FOR{each successor $s'$ of $s$}
+    \STATE $Update(s, s')$
+    \ENDFOR
+    \ENDIF
+    
+  \end{algorithmic}
+\end{algorithm}
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.8\textwidth]{./eps/path_marking}
+  \caption{(a) The constructed DAG for sequences ACTAGCTA and TCAGGTAT
+    by Algorithm 1. (b) The longest paths from the end node to source
+    node from which the MLCS can be obtained.}
+  \label{fig:path_marking}
+\end{figure}
+
+
+\section{Experimental Results}
+\label{sec:experiments}
+
+In this section, we evaluate the performance of our \emph{PM-MLCS}
+algorithm and three other state-of-the-art algorithms
+\emph{Top\_MLCS}\cite{LiICDE}, \emph{Quick-DP} \cite{Wang2011} and
+\emph{Fast\_LCS} \cite{Chen2006} on MLCS problems of various data
+sizes.
+
+\subsection{Experimental Setups}
+\label{sec:setup}
+
+In the experiments, all the algorithms are run on a Inspur Corporation
+K1 800 high-performance key host with Intel Xeon E7-8870, 4 chip, 4
+cores/chip (2.80 GHz) and 1TB memory in the High Performance Computing
+Center of Xidian University. The operating system is GNU/Linux
+(2.6.32) x86\_64, and all the algorithms are implemented with C/C++
+compiled by \emph{gcc} along with option '-O2', according to their
+papers respectively. The benchmark datasets used in the experiments
+are real biological sequences from the \emph{NCBI} \cite{} and
+\emph{DIP} \cite{} corpus.
+
+\subsection{Evaluation under various numbers of sequences}
+\label{sec:number}
+
+Firstly, we evaluate the testing algorithms under various numbers of
+sequences. There are 17 groups of DNA ($|\Sigma|=4$) as well as
+protein sequences ($|\Sigma|=20$) for testing, with the number of
+sequences in each group varying from 3 to 100. The sequences in all
+groups have the same length 100. All the algorithms are independly run
+10 times on each group of data and the mean running times are computed
+and shown in Table \ref{} and Fig.\ref{}.
+
+
+
+
 
 \section{Acknowledgments}
 
@@ -378,28 +700,32 @@ Universities (BDZ021430).
 
 \begin{thebibliography}{99}
 
+\bibitem{Maier1978} D. Maier, “The Complexity of Some Problems on
+  Subsequences and Supersequences”, J. ACM, vol.25, pp.322-336, 1978.
+
+
 \bibitem{Smith1981} T.F. Smith and M.S. Waterman, “Identification of
-  Common Molecular Subsequences,” J. Molecular Biology, vol. 147,
-  pp. 195-197, 1981.
+  Common Molecular Subsequences,” J. Molecular Biology, vol.147,
+  pp.195-197, 1981.
 
 \bibitem{Sankoff1972} D. Sankoff, “Matching Sequences under
-Deletion/Insertion Con- straints,” Proc. Nat’l Academy Sciences USA,
-vol. 69, pp. 4-6, Jan.  1972.
+  Deletion/Insertion Con- straints,” Proc. Nat’l Academy Sciences
+  USA, vol.69, pp.4-6, Jan. 1972.
 
 \bibitem{Hsu1984} W.J. Hsu and M.W. Du, “Computing a Longest Common
-  Subsequence for a Set of Strings,” BIT Numerical Math., vol. 24,
-  no. 1, pp. 45-59, 1984.
+  Subsequence for a Set of Strings,” BIT Numerical Math.,
+  24(1):45-59. 1984.
 
 \bibitem{Hirschberg1977} D.S. Hirschberg, “Algorithms for the Longest Common Subse-
 quence Problem,” J. ACM, vol. 24, pp. 664-675, 1977
 
 \bibitem{Apostolico1992} A. Apostolico, S. Browne, and C. Guerra,
   “Fast Linear-Space Com- putations of Longest Common Subsequences,”
-  Theoretical Com- puter Science, vol. 92, no. 1, pp. 3-17, 1992.
+  Theoretical Computer Science, vol. 92, no. 1, pp. 3-17, 1992.
 
 \bibitem{Masek1980} W.J. Masek and M.S. Paterson, “A Faster Algorithm
   Computing String Edit Distances,” J. Computer System Sciences,
-  vol. 20, pp. 18- 31, 1980.
+  vol. 20, pp. 18-31, 1980.
 
 \bibitem{Rick1994} C. Rick, “New Algorithms for the Longest Common
   Subsequence Problem,” Technical Report No. 85123-CS, Computer
@@ -407,20 +733,19 @@ quence Problem,” J. ACM, vol. 24, pp. 664-675, 1977
   
 \bibitem{Hunt1977} J. W. Hunt and T. G. Szymanski. A fast algorithm
   for computing longest common subsequences.  Communications of the
-  ACM, 20(5):350–353, 1977.
+  ACM, 20(5):350-353, 1977.
 
 \bibitem{Korkin2001} D. Korkin. A new dominant point-based parallel
   algorithm for multiple longest common subsequence problem. Technical
-  report, TR01-148, Univ. of New Brunswick, 2001
+  report, TR01-148, Univ. of New Brunswick, 2001.
 
 \bibitem{Chen2006} Y. Chen, A. Wan, and W. Liu. A fast parallel
-algorithm for finding the longest common sequence of
-multiple biosequences. BMC Bioinformatics, 7(Suppl
-4):S4, 2006.
+  algorithm for finding the longest common sequence of multiple
+  biosequences. BMC Bioinformatics, 7(Suppl 4):S4, 2006.
 
 \bibitem{Wang2011} Q. Wang, D. Korkin, and Y. Shang. A fast multiple
 longest common subsequence (MLCS) algorithm.  Knowledge and Data
-Engineering, IEEE Transactions on, 23(3):321–334, 2011.
+Engineering, IEEE Transactions on, 23(3):321-334, 2011.
 
 \bibitem{Li2012} Y. Li, Y. Wang, and L. Bao. Facc: a novel finite
   automaton based on cloud computing for the multiple longest common
@@ -430,28 +755,34 @@ Engineering, IEEE Transactions on, 23(3):321–334, 2011.
 \bibitem{Yang2010} J. Yang, Y. Xu, and Y. Shang. An efficient parallel
   algorithm for longest common subsequence problem on GPUs. In
   Proceedings of the World Congress on Engineering, volume 1, pp.
-  499–504, 2010.
+  499-504, 2010.
 
 \bibitem{Yang2013} J. Yang, Y. Xu, and Y. Shang. A new progressive
   algorithm for a multiple longest common subsequences problem and its
   efficient parallelization. Parallel and Distributed Systems, IEEE
-  Transactions on, 24(5):862–870, 2013.
+  Transactions on, 24(5):862-870, 2013.
 
 \bibitem{Yang2014} J. Yang, Y. Xu, and Y. Shang. A space-bounded
   anytime algorithm for the multiple longest common subsequence
   problem. Knowledge and Data Engineering, Transactions on,
-  26(11):2599–2609, 2014.
+  26(11):2599-2609, 2014.
 
 \bibitem{LiICDE} Yanni Li, Yuping Wang, Zhensong Zhang, etc. A Novel
   Fast and Memory Efficient Parallel MLCS Algorithm for Long and
   Large-Scale Sequences Alignments.  IEEE International Conference on
   Data Engineering (ICDE). pp.1170-1181. 2016.
 
-\bibitem{LiSIGKDD} Li, Yanni and Li, Hui and Duan, Tihua, etc. A Real Linear
-and Parallel Multiple Longest Common Subsequences (MLCS)
-Algorithm. Proceedings of the 22nd ACM SIGKDD International Conference
-on Knowledge Discovery and Data
-Mining. pp.1170-1181. pp.1725-1734. 2016.
+\bibitem{LiSIGKDD} Li, Yanni and Li, Hui and Duan, Tihua, etc. A Real
+  Linear and Parallel Multiple Longest Common Subsequences (MLCS)
+  Algorithm. Proceedings of the 22nd ACM SIGKDD International
+  Conference on Knowledge Discovery and Data
+  Mining. pp.1725-1734. 2016.
+
+\bibitem{NCBI} Available:
+  http://www.ncbi.nlm.nih.gov/nuccore/110645304?report=fasta
+
+\bibitem{DIP} Database of Interacting Proteins. Available:
+  http://dip.doe-mbi.ucla.edu/dip/Download.cgi
 
 
 
